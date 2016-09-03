@@ -1,0 +1,12 @@
+<Mod ID="SkipPlaneCrash">
+  <Compatible>0.45b</Compatible>
+  <Name>
+    <EN>Skip Plane Crash</EN>
+    <DE>Flugzeugabsturz Überspringen</DE>
+  </Name>
+  <Description>
+    <EN>Automatically skips the plane crash</EN>
+    <DE>Überspringt automatisch den Flugzeugabsturz</DE>
+  </Description>
+  <Version>1.0</Version>
+</Mod>
