@@ -1,0 +1,12 @@
+<Mod ID="BlockFocusAttack">
+  <Compatible>0.45b</Compatible>
+  <Name>
+    <EN>Block Focus Attack</EN>
+    <DE>Fokusierungsangriff blockieren</DE>
+  </Name>
+  <Description>
+    <EN>Blocks attacking when the game is out of focus and you focus it again with a left click</EN>
+    <DE>Verhindert das beim Fokusieren mit der linken Maustaste ein Angriff ausgeführt wird</DE>
+  </Description>
+  <Version>1.0</Version>
+</Mod>
