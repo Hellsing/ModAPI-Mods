@@ -1,0 +1,66 @@
+<Mod ID="GriefClientPro">
+  <Compatible>0.45b</Compatible>
+  <Button Standard="X" ID="SphereAction">
+    <Name>
+      <EN>Sphere Action</EN>
+    </Name>
+    <Description>
+      <EN>Executes action(s) defined in the settings</EN>
+    </Description>
+  </Button>
+  <Button Standard="F1" ID="OpenMenu">
+    <Name>
+      <EN>Open Menu</EN>
+    </Name>
+    <Description>
+      <EN>Opens the grief client menu</EN>
+    </Description>
+  </Button>
+  <Button Standard="F" ID="InstantBuild">
+    <Name>
+      <EN>Instant Build</EN>
+    </Name>
+    <Description>
+      <EN>Press this key to instant build a blueprint</EN>
+    </Description>
+  </Button>
+  <Button Standard="F2" ID="FreezeTime">
+    <Name>
+      <EN>Freeze Time</EN>
+    </Name>
+    <Description>
+      <EN>Freezes the time</EN>
+    </Description>
+  </Button>
+  <Button Standard="F3" ID="FreeCam">
+    <Name>
+      <EN>Free Cam</EN>
+    </Name>
+    <Description>
+      <EN>Makes the cam fly free</EN>
+    </Description>
+  </Button>
+  <Button Standard="F7" ID="DestroyEverything">
+    <Name>
+      <EN>Destroy Everything</EN>
+    </Name>
+    <Description>
+      <EN>Destroys every single building on the server, including blueprints</EN>
+    </Description>
+  </Button>
+  <Button Standard="H" ID="Aura">
+    <Name>
+      <EN>Aura</EN>
+    </Name>
+    <Description>
+      <EN>Executes actions around your camera permanently</EN>
+    </Description>
+  </Button>
+  <Name>
+    <EN>Grief Client Pro</EN>
+  </Name>
+  <Description>
+    <EN>Grief Client</EN>
+  </Description>
+  <Version>1.0</Version>
+</Mod>
