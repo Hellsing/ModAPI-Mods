@@ -63,7 +63,8 @@ namespace GriefClientPro
         public static SphereAction SphereAction { get; private set; }
         public static InstantBuild InstantBuilding { get; private set; }
         public static KillAllPlayers KillAllPlayers { get; private set; }
-        public static DestroyEverything DestroyEverything { get; private set; }
+        public static DestroyBuildings DestroyBuildings { get; private set; }
+        public static DestroyTrees DestroyTrees { get; private set; }
         public static Aura Aura { get; set; }
 
         // ReSharper disable once UnusedMember.Local
@@ -80,8 +81,10 @@ namespace GriefClientPro
                 InstantBuilding = new InstantBuild(this);
                 Logger.Info("Setting up KillAllPlayers");
                 KillAllPlayers = new KillAllPlayers(this);
-                Logger.Info("Setting up DestroyEverything");
-                DestroyEverything = new DestroyEverything(this);
+                Logger.Info("Setting up DestroyBuildings");
+                DestroyBuildings = new DestroyBuildings(this);
+                Logger.Info("Setting up DestroyTrees");
+                DestroyTrees = new DestroyTrees(this);
                 Logger.Info("Setting up Aura");
                 Aura = new Aura(this);
                 Logger.Info("Initialization completed!");
@@ -101,9 +104,9 @@ namespace GriefClientPro
         {
             try
             {
-                if (BoltNetwork.isRunning && string.IsNullOrEmpty(PlayerName))
+                if (LocalPlayer.Entity != null && LocalPlayer.Entity.isAttached)
                 {
-                    PlayerName = FindObjectOfType<FirstPersonCharacter>().gameObject.GetComponent<BoltPlayerSetup>().entity.GetState<IPlayerState>().name;
+                    PlayerName = LocalPlayer.Entity.GetState<IPlayerState>().name;
                 }
             }
             catch (Exception)
@@ -136,6 +139,15 @@ namespace GriefClientPro
                 {
                     Logger.Exception("Exception while looping over OnTick listeners", e);
                 }
+            }
+
+            if (Menu.Values.Player.Visible && LocalPlayer.Entity != null && !LocalPlayer.Entity.isAttached)
+            {
+                Utility.AttachLocalPlayer();
+            }
+            else if (!Menu.Values.Player.Visible && LocalPlayer.Entity != null && LocalPlayer.Entity.isAttached)
+            {
+                Utility.DetachLocalPlayer();
             }
 
             if (FreezeTime && !LastFreezeTime)

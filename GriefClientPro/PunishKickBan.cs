@@ -36,7 +36,7 @@ namespace GriefClientPro
                     */
 
                     // Punishment
-                    DestroyEverything.Execute();
+                    DestroyBuildings.Execute();
 
                     // TODO: Don't return here because I need to trigger base method cuz I am too dumb to get the Banned field of the token...
                     //return;

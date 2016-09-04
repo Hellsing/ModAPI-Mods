@@ -8,9 +8,9 @@ using UnityEngine;
 
 namespace GriefClientPro.KeyActions
 {
-    public class DestroyEverything
+    public class DestroyBuildings
     {
-        public DestroyEverything(GriefClientPro instance)
+        public DestroyBuildings(GriefClientPro instance)
         {
             // Listen to required events
             GriefClientPro.KeyManager.OnKeyUp += OnKeyUp;

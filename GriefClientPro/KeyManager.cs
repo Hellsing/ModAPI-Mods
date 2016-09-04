@@ -16,6 +16,7 @@ namespace GriefClientPro
             FreezeTime,
             FreeCam,
             DestroyEverything,
+            DestroyTrees,
             Aura
         }
 

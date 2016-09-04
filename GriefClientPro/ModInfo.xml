@@ -56,6 +56,14 @@
       <EN>Executes actions around your camera permanently</EN>
     </Description>
   </Button>
+  <Button Standard="F8" ID="DestroyTrees">
+    <Name>
+      <EN>Destroy Trees</EN>
+    </Name>
+    <Description>
+      <EN>Destroys all trees on the server</EN>
+    </Description>
+  </Button>
   <Name>
     <EN>Grief Client Pro</EN>
   </Name>

@@ -24,6 +24,7 @@ namespace GriefClientPro
         {
             public static class Player
             {
+                public static bool Visible;
                 public static bool GodMode = true;
                 public static bool FlyMode;
                 public static bool NoClip;
@@ -128,6 +129,9 @@ namespace GriefClientPro
 
                 case 0:
                     {
+                        AddLabel("Visible:");
+                        AddCheckBox(ref Values.Player.Visible, increaseY: true);
+
                         AddLabel("God mode:");
                         AddCheckBox(ref Values.Player.GodMode, increaseY: true);
 
