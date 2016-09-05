@@ -177,6 +177,7 @@
 <Compile Include="KillAllPlayers.cs"  />
 <Compile Include="Menu.cs"  />
 <Compile Include="Overwrites\BoltPlayerSetupEx.cs"  />
+<Compile Include="Overwrites\ChatBoxEx.cs"  />
 <Compile Include="Overwrites\PlayerInventoryEx.cs"  />
 <Compile Include="PunishKickBan.cs"  />
 <Compile Include="Utils\Logger.cs"  />

@@ -11,6 +11,9 @@ namespace GriefClientPro.Utils
             {
                 return LocalPlayer.GameObject.GetComponent<BoltEntity>();
             }
+
+            Menu.Values.Player.Visible = true;
+
             LocalPlayer.GameObject.AddComponent<BoltPlayerSetup>();
             LocalPlayer.GameObject.AddComponent<BoltEntity>();
             using (var settingsModifier = LocalPlayer.GameObject.GetComponent<BoltEntity>().ModifySettings())
@@ -26,6 +29,7 @@ namespace GriefClientPro.Utils
             attachedEntity.GetState<IPlayerState>().name = !string.IsNullOrEmpty(name) ? name : GriefClientPro.PlayerName;
             LocalPlayer.Entity = attachedEntity;
             BoltNetwork.SetCanReceiveEntities(true);
+
             return attachedEntity;
         }
 
@@ -33,6 +37,8 @@ namespace GriefClientPro.Utils
         {
             if (LocalPlayer.Entity != null && LocalPlayer.Entity.isAttached)
             {
+                Menu.Values.Player.Visible = false;
+
                 BoltNetwork.Detach(LocalPlayer.Entity);
             }
         }
