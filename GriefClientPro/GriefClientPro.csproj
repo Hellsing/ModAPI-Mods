@@ -178,8 +178,11 @@
 <Compile Include="Menu.cs"  />
 <Compile Include="Overwrites\BoltPlayerSetupEx.cs"  />
 <Compile Include="Overwrites\ChatBoxEx.cs"  />
+<Compile Include="Overwrites\CoopVoiceEx.cs"  />
 <Compile Include="Overwrites\PlayerInventoryEx.cs"  />
 <Compile Include="PunishKickBan.cs"  />
+<Compile Include="Utils\BoltPrefabsHelper.cs"  />
+<Compile Include="Utils\Extensions.cs"  />
 <Compile Include="Utils\Logger.cs"  />
 <Compile Include="NameGenerator.cs"  />
 <Compile Include="Overwrites\BuildingRepairEx.cs"  />

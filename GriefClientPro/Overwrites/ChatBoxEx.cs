@@ -5,19 +5,20 @@ using GriefClientPro.Utils;
 using TheForest.UI.Multiplayer;
 using TheForest.Utils;
 using UnityEngine;
+using Random = System.Random;
 
 namespace GriefClientPro.Overwrites
 {
     public class ChatBoxEx : ChatBox
     {
-        private System.Random _random;
-        private System.Random Random => _random ?? (_random = new System.Random(DateTime.Now.Millisecond));
+        private Random _random;
+        private Random Random => _random ?? (_random = new Random(DateTime.Now.Millisecond));
 
         public override void OnSubmit()
         {
             if (!string.IsNullOrEmpty(_input.value))
             {
-                Logger.Info("Trying to submit: {0}", _input.value);
+                //Logger.Info("Trying to submit: {0}", _input.value);
 
                 try
                 {
@@ -31,11 +32,11 @@ namespace GriefClientPro.Overwrites
                     if (detached)
                     {
                         // Pick a random player on the server
-                        var player = Players.Keys.ToArray()[Random.Next(Players.Count)];
+                        var player = Players.Keys.ToList().Shuffle()[0];
 
                         // Write with player name
                         var chatEvent = ChatEvent.Create(GlobalTargets.OnlyServer);
-                        chatEvent.Message = "<†> " + _input.value;
+                        chatEvent.Message = "<ツ> " + _input.value;
                         chatEvent.Sender = player;
                         chatEvent.Send();
                     }

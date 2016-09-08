@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Timers;
+using Console = ModAPI.Console;
 
 namespace GriefClientPro.Utils
 {
@@ -90,7 +91,7 @@ namespace GriefClientPro.Utils
 
             foreach (var line in message)
             {
-                ModAPI.Console.Write(line, GriefClientPro.ModName);
+                Console.Write(line, GriefClientPro.ModName);
             }
         }
 
