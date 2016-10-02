@@ -39,6 +39,9 @@ namespace GriefClientPro.Overwrites
                         chatEvent.Message = "<ツ> " + _input.value;
                         chatEvent.Sender = player;
                         chatEvent.Send();
+
+                        // Display locally
+                        AddLine(player, chatEvent.Message);
                     }
                     else
                     {
