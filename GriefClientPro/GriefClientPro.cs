@@ -28,12 +28,24 @@ namespace GriefClientPro
         // ReSharper disable once UnusedMember.Local
         private static void Init()
         {
-            if (DummyObject == null)
+            Logger.Info("Initializing GriefClientPro...");
+            Logger.Info("Dummy object: " + (DummyObject == null ? "null (good)" : "already set (bad)"));
+
+            try
             {
-                DummyObject = new GameObject($"__{ModName}__");
-                DummyObject.AddComponent<GriefClientPro>();
-                DummyObject.AddComponent<Menu>();
+                if (DummyObject == null)
+                {
+                    DummyObject = new GameObject($"__{ModName}__");
+                    DummyObject.AddComponent<GriefClientPro>();
+                    DummyObject.AddComponent<Menu>();
+                }
             }
+            catch (Exception e)
+            {
+                Logger.Exception("Failed to initialize dummy object", e);
+            }
+
+            Logger.SaveLogToFile();
         }
 
         protected int Tab;

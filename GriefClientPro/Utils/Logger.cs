@@ -19,20 +19,23 @@ namespace GriefClientPro.Utils
         static Logger()
         {
             // Delete old log file
-            File.Delete(LogFileLocation);
+            if (File.Exists(LogFileLocation))
+            {
+                File.Delete(LogFileLocation);
+            }
 
             // Initialize
-            LogSaveTimer.Elapsed += OnLogSaveTimerElapsed;
+            LogSaveTimer.Elapsed += (sender, args) => SaveLogToFile();
             LogSaveTimer.Start();
         }
 
-        private static void OnLogSaveTimerElapsed(object sender, ElapsedEventArgs elapsedEventArgs)
+        public static void SaveLogToFile()
         {
             if (!Directory.Exists(LogsDirectory))
             {
                 Directory.CreateDirectory(LogsDirectory);
             }
-            
+
             var fileInfo = new FileInfo(LogFileLocation);
             if (fileInfo.Exists)
             {
@@ -71,7 +74,7 @@ namespace GriefClientPro.Utils
             Error,
             Severe
         }
-        
+
         private static void WriteLog(params string[] message)
         {
             lock (QueuedLines)
@@ -86,7 +89,6 @@ namespace GriefClientPro.Utils
                     messages.Reverse();
                     QueuedLines.AddRange(messages);
                 }
-                
             }
 
             foreach (var line in message)
