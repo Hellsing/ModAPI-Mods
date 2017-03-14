@@ -1,11 +1,11 @@
 # ModAPI-Mods
 Mods I've created for ModAPI for TheForest
 
-## BlockFocusAttack ([Post](http://www.modapi.de/mods/index.php/Entry/16-/))
+## BlockFocusAttack ([Post](http://www.modapi.cc/mods/index.php/Entry/16-/))
 Blocks attacking when the game is out of focus and you focus it again with a left click.
 This is only usefull when you have two monitors and play the game on windowed mode.
 
-## SkipPlaneCrash ([Post](http://www.modapi.de/mods/index.php/Entry/15-/))
+## SkipPlaneCrash ([Post](http://www.modapi.cc/mods/index.php/Entry/15-/))
 This mod will automatically skip the plane crash for you, just like when you press Spacebar in the intro.
 
 ## GriefClientPro (Grief/Cheat Mod)
