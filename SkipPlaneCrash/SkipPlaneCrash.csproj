@@ -45,6 +45,10 @@
       <HintPath>../../../modlib/TheForest/TheForest_data/Managed/Assembly-UnityScript.dll</HintPath>
       <Private>False</Private>
     </Reference>
+<Reference Include="SteamworksManaged">
+      <HintPath>../../../modlib/TheForest/TheForest_data/Managed/SteamworksManaged.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
 <Reference Include="Boo.Lang">
       <HintPath>../../../modlib/TheForest/TheForest_data/Managed/Boo.Lang.dll</HintPath>
       <Private>False</Private>
