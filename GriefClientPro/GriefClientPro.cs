@@ -1,8 +1,10 @@
 ﻿using System;
 using System.IO;
+using Bolt;
 using GriefClientPro.KeyActions;
 using GriefClientPro.Utils;
 using ModAPI.Attributes;
+using TheForest.Networking;
 using TheForest.UI.Multiplayer;
 using TheForest.Utils;
 using UnityEngine;
@@ -23,6 +25,38 @@ namespace GriefClientPro
         public event TickHandler OnTick;
 
         private static GameObject DummyObject { get; set; }
+        private static Vector3 LastFirePos { get; set; }
+        private static int LastFireTime { get; set; }
+
+        private static bool _freezeTime;
+        public static bool FreezeTime
+        {
+            get { return _freezeTime; }
+            set
+            {
+                _freezeTime = value;
+                _frozenTimeValue = TheForestAtmosphere.Instance.TimeOfDay;
+            }
+        }
+        private static float _frozenTimeValue;
+        public static float TimeOfDay
+        {
+            get { return FreezeTime ? _frozenTimeValue : TheForestAtmosphere.Instance.TimeOfDay; }
+            set
+            {
+                _frozenTimeValue = value;
+                TheForestAtmosphere.Instance.TimeOfDay = value;
+            }
+        }
+
+        public static KeyManager KeyManager { get; private set; }
+        public static PlayerManager PlayerManager { get; private set; }
+        public static SphereAction SphereAction { get; private set; }
+        public static InstantBuild InstantBuilding { get; private set; }
+        public static KillAllPlayers KillAllPlayers { get; private set; }
+        public static DestroyBuildings DestroyBuildings { get; private set; }
+        public static DestroyTrees DestroyTrees { get; private set; }
+        public static Aura Aura { get; set; }
 
         [ExecuteOnGameStart]
         // ReSharper disable once UnusedMember.Local
@@ -48,37 +82,6 @@ namespace GriefClientPro
             Logger.SaveLogToFile();
         }
 
-        protected int Tab;
-
-        private static bool _freezeTime;
-        public static bool FreezeTime
-        {
-            get { return _freezeTime; }
-            set
-            {
-                _freezeTime = value;
-                _frozenTimeValue = TheForestAtmosphere.Instance.TimeOfDay;
-            }
-        }
-        private static float _frozenTimeValue;
-        public static float TimeOfDay
-        {
-            get { return FreezeTime ? _frozenTimeValue : TheForestAtmosphere.Instance.TimeOfDay; }
-            set
-            {
-                _frozenTimeValue = value;
-                TheForestAtmosphere.Instance.TimeOfDay = value;
-            }
-        }
-
-        public static KeyManager KeyManager { get; private set; }
-        public static SphereAction SphereAction { get; private set; }
-        public static InstantBuild InstantBuilding { get; private set; }
-        public static KillAllPlayers KillAllPlayers { get; private set; }
-        public static DestroyBuildings DestroyBuildings { get; private set; }
-        public static DestroyTrees DestroyTrees { get; private set; }
-        public static Aura Aura { get; set; }
-
         // ReSharper disable once UnusedMember.Local
         private void Start()
         {
@@ -87,6 +90,8 @@ namespace GriefClientPro
                 // Initialize properties
                 Logger.Info("Setting up KeyManager");
                 KeyManager = new KeyManager(this);
+                Logger.Info("Setting up PlayerManager");
+                PlayerManager = new PlayerManager(this);
                 Logger.Info("Setting up SphereAction");
                 SphereAction = new SphereAction();
                 Logger.Info("Setting up InstantBuilding");
@@ -116,7 +121,7 @@ namespace GriefClientPro
         {
             try
             {
-                if (LocalPlayer.Entity != null && LocalPlayer.Entity.isAttached)
+                if (BoltNetwork.isRunning && LocalPlayer.Entity != null && LocalPlayer.Entity.isAttached)
                 {
                     PlayerName = LocalPlayer.Entity.GetState<IPlayerState>().name;
                 }
@@ -153,13 +158,30 @@ namespace GriefClientPro
                 }
             }
 
-            if (Menu.Values.Player.Visible && LocalPlayer.Entity != null && !LocalPlayer.Entity.isAttached)
+            if (BoltNetwork.isRunning)
             {
-                Utility.AttachLocalPlayer();
-            }
-            else if (!Menu.Values.Player.Visible && LocalPlayer.Entity != null && LocalPlayer.Entity.isAttached)
-            {
-                Utility.DetachLocalPlayer();
+                // Visible player
+                if (Menu.Values.Self.Visible && LocalPlayer.Entity != null && !LocalPlayer.Entity.isAttached)
+                {
+                    Utility.AttachLocalPlayer();
+                }
+                // Invisible player
+                else if (!Menu.Values.Self.Visible && LocalPlayer.Entity != null && LocalPlayer.Entity.isAttached)
+                {
+                    Utility.DetachLocalPlayer();
+                }
+
+                // Add fire trail to movement
+                if (Menu.Values.Self.FireTrail)
+                {
+                    var feetPos = LocalPlayer.Transform.position - new Vector3(0, 4, 0);
+                    if (Vector3.Distance(LastFirePos, feetPos) > 2 || Environment.TickCount - LastFireTime > 5000)
+                    {
+                        LastFirePos = feetPos;
+                        LastFireTime = Environment.TickCount;
+                        BoltPrefabsHelper.Spawn(BoltPrefabs.Fire, feetPos, LocalPlayer.Transform.rotation);
+                    }
+                }
             }
 
             if (FreezeTime && !LastFreezeTime)
@@ -231,6 +253,7 @@ namespace GriefClientPro
             {
                 Menu.Values.Other.FreeCam = !Menu.Values.Other.FreeCam;
             }
+
             if (ModAPI.Input.GetButton("SphereAction"))
             {
                 SphereAction?.OnPrepare();
@@ -239,37 +262,65 @@ namespace GriefClientPro
             {
                 SphereAction?.OnTick();
             }
-            if (Menu.Values.Stats.FixBodyTemp)
+
+            if (LocalPlayer.Stats != null)
             {
-                LocalPlayer.Stats.BodyTemp = Menu.Values.Stats.FixedBodyTemp;
+                if (Menu.Values.Stats.FixBodyTemp)
+                {
+                    LocalPlayer.Stats.BodyTemp = Menu.Values.Stats.FixedBodyTemp;
+                }
+                if (Menu.Values.Stats.FixBatteryCharge)
+                {
+                    LocalPlayer.Stats.BatteryCharge = Menu.Values.Stats.FixedBatteryCharge;
+                }
+                if (Menu.Values.Stats.FixEnergy)
+                {
+                    LocalPlayer.Stats.Energy = Menu.Values.Stats.FixedEnergy;
+                }
+                if (Menu.Values.Stats.FixHealth)
+                {
+                    LocalPlayer.Stats.Health = Menu.Values.Stats.FixedHealth;
+                }
+                if (Menu.Values.Stats.FixStamina)
+                {
+                    LocalPlayer.Stats.Stamina = Menu.Values.Stats.FixedStamina;
+                }
+                if (Menu.Values.Stats.FixFullness)
+                {
+                    LocalPlayer.Stats.Fullness = Menu.Values.Stats.FixedFullness;
+                }
+                if (Menu.Values.Stats.FixStarvation)
+                {
+                    LocalPlayer.Stats.Starvation = Menu.Values.Stats.FixedStarvation;
+                }
+                if (Menu.Values.Stats.FixThirst)
+                {
+                    LocalPlayer.Stats.Thirst = Menu.Values.Stats.FixedThirst;
+                }
             }
-            if (Menu.Values.Stats.FixBatteryCharge)
+
+            if (BoltNetwork.isRunning && Menu.Values.Other.InstaRevive)
             {
-                LocalPlayer.Stats.BatteryCharge = Menu.Values.Stats.FixedBatteryCharge;
-            }
-            if (Menu.Values.Stats.FixEnergy)
-            {
-                LocalPlayer.Stats.Energy = Menu.Values.Stats.FixedEnergy;
-            }
-            if (Menu.Values.Stats.FixHealth)
-            {
-                LocalPlayer.Stats.Health = Menu.Values.Stats.FixedHealth;
-            }
-            if (Menu.Values.Stats.FixStamina)
-            {
-                LocalPlayer.Stats.Stamina = Menu.Values.Stats.FixedStamina;
-            }
-            if (Menu.Values.Stats.FixFullness)
-            {
-                LocalPlayer.Stats.Fullness = Menu.Values.Stats.FixedFullness;
-            }
-            if (Menu.Values.Stats.FixStarvation)
-            {
-                LocalPlayer.Stats.Starvation = Menu.Values.Stats.FixedStarvation;
-            }
-            if (Menu.Values.Stats.FixThirst)
-            {
-                LocalPlayer.Stats.Thirst = Menu.Values.Stats.FixedThirst;
+                foreach (var player in PlayerManager.Players)
+                {
+                    var triggerObject = player.DeadTriggerObject;
+                    if (triggerObject != null && triggerObject.activeSelf)
+                    {
+                        var trigger = triggerObject.GetComponent<RespawnDeadTrigger>();
+
+                        Logger.Info("trigger != null");
+                        Logger.Info("Reviving " + player.Entity.GetState<IPlayerState>().name);
+
+                        // Send revive packet
+                        var playerHealed = PlayerHealed.Create(GlobalTargets.Others);
+                        playerHealed.HealingItemId = trigger._healItemId;
+                        playerHealed.HealTarget = player.Entity;
+                        PacketQueue.Add(playerHealed);
+
+                        // Set revive trigger inactive
+                        trigger.SendMessage("SetActive", false);
+                    }
+                }
             }
         }
     }

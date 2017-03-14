@@ -1,4 +1,5 @@
 ﻿using System;
+using Bolt;
 
 namespace GriefClientPro.KeyActions
 {
@@ -20,19 +21,25 @@ namespace GriefClientPro.KeyActions
 
         public static void Execute()
         {
-            // Get all buildings
-            var trees = UnityEngine.Object.FindObjectsOfType<TreeHealth>();
-
-            // Destroy buildings
-            foreach (var tree in trees)
+            if (BoltNetwork.isRunning)
             {
-                try
+                // Destroy all trees
+                foreach (var tree in UnityEngine.Object.FindObjectsOfType<TreeHealth>())
                 {
-                    tree.SendMessage("Explosion", 100f);
-                }
-                catch (Exception)
-                {
-                    // ignored
+                    var entity = tree.LodTree.GetComponent<BoltEntity>();
+                    //if (entity.isAttached)
+                    {
+                        try
+                        {
+                            var destroyTree = DestroyTree.Create(GlobalTargets.OnlyServer);
+                            destroyTree.Tree = entity;
+                            PacketQueue.Add(destroyTree);
+                        }
+                        catch (Exception)
+                        {
+                            // ignored
+                        }
+                    }
                 }
             }
         }

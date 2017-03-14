@@ -4,7 +4,7 @@
     {
         protected override void Hit()
         {
-            if (Menu.Values.Player.InstantTree)
+            if (Menu.Values.Self.InstantTree)
             {
                 Explosion(100f);
             }

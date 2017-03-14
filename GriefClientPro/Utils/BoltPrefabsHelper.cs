@@ -46,7 +46,7 @@ namespace GriefClientPro.Utils
                 dropItem.PrefabId = prefabId;
                 dropItem.Position = position;
                 dropItem.Rotation = rotation;
-                dropItem.Send();
+                PacketQueue.Add(dropItem);
                 return null;
             }
 

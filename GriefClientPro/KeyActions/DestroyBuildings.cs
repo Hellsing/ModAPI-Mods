@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
+using Bolt;
 using TheForest.Buildings.Creation;
 using TheForest.Buildings.World;
 using TheForest.World;
-using UnityEngine;
 
 namespace GriefClientPro.KeyActions
 {
@@ -26,48 +25,38 @@ namespace GriefClientPro.KeyActions
 
         public static void Execute()
         {
-            // Get all blueprints
-            var blueprints = new List<Craft_Structure>(UnityEngine.Object.FindObjectsOfType<Craft_Structure>());
-
-            // Delete all blueprints
-            foreach (var blueprint in blueprints)
+            if (BoltNetwork.isRunning)
             {
-                try
+                foreach (var entity in BoltNetwork.entities.Where(entity => entity.isAttached))
                 {
-                    blueprint.SendMessage("CancelBlueprint");
-                    blueprint.SendMessage("CancelBlueprintSafe");
-                }
-                catch (Exception)
-                {
-                    // ignored
-                }
-            }
-
-            // Get all buildings
-            var buildings = new List<GameObject>(UnityEngine.Object.FindObjectsOfType<destroyStructure>().Select(o => o.gameObject));
-            buildings.AddRange(UnityEngine.Object.FindObjectsOfType<BuildingHealthHitRelay>().Select(o => o.gameObject));
-            buildings.AddRange(UnityEngine.Object.FindObjectsOfType<BuildingHealthChunkHitRelay>().Select(o => o.gameObject));
-            buildings.AddRange(UnityEngine.Object.FindObjectsOfType<FoundationChunkTier>().Select(o => o.gameObject));
-            buildings.AddRange(UnityEngine.Object.FindObjectsOfType<BuildingHealth>().Select(o => o.gameObject));
-
-            // Destroy buildings
-            foreach (var building in buildings)
-            {
-                try
-                {
-                    destroyStructure structure;
-                    if ((structure = building.GetComponent<destroyStructure>()) != null)
+                    try
                     {
-                        structure.SendMessage("Hit", structure.health);
+                        if (entity.GetComponentInChildren<Craft_Structure>())
+                        {
+                            // Cancel blueprints
+                            var cancelBlueprint = CancelBluePrint.Create(GlobalTargets.OnlyServer);
+                            cancelBlueprint.BluePrint = entity;
+                            PacketQueue.Add(cancelBlueprint);
+                        }
+                        else if (entity.StateIs<IBuildingDestructibleState>())
+                        {
+                            // Destroy building
+                            var destroyBuilding = DestroyBuilding.Create(GlobalTargets.OnlyServer);
+                            destroyBuilding.BuildingEntity = entity;
+                            PacketQueue.Add(destroyBuilding);
+                        }
+                        else if (entity.gameObject.GetComponentInChildren<BuildingHealthHitRelay>() ||
+                                 entity.gameObject.GetComponentInChildren<BuildingHealthChunkHitRelay>() ||
+                                 entity.gameObject.GetComponentInChildren<FoundationChunkTier>() ||
+                                 entity.gameObject.GetComponentInChildren<BuildingHealth>())
+                        {
+                            entity.gameObject.SendMessage("LocalizedHit", new LocalizedHitData(entity.gameObject.transform.position, 10000f));
+                        }
                     }
-                    else
+                    catch (Exception)
                     {
-                        building.SendMessage("LocalizedHit", new LocalizedHitData(building.transform.position, 10000f));
+                        // ignored
                     }
-                }
-                catch (Exception)
-                {
-                    // ignored
                 }
             }
         }

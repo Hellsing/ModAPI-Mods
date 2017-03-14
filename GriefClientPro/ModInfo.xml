@@ -1,5 +1,5 @@
 <Mod ID="GriefClientPro">
-  <Compatible>0.48b</Compatible>
+  <Compatible>Manual</Compatible>
   <Button Standard="X" ID="SphereAction">
     <Name>
       <EN>Sphere Action</EN>

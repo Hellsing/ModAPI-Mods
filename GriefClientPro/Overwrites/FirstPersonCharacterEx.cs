@@ -46,20 +46,20 @@ namespace GriefClientPro.Overwrites
 
         protected override void FixedUpdate()
         {
-            walkSpeed = BaseWalkSpeed * Menu.Values.Player.SpeedMultiplier;
-            runSpeed = BaseRunSpeed * Menu.Values.Player.SpeedMultiplier;
-            jumpHeight = BaseJumpHeight * Menu.Values.Player.JumpMultiplier;
-            crouchSpeed = BaseCrouchSpeed * Menu.Values.Player.SpeedMultiplier;
-            strafeSpeed = BaseStrafeSpeed * Menu.Values.Player.SpeedMultiplier;
-            swimmingSpeed = BaseSwimmingSpeed * Menu.Values.Player.SpeedMultiplier;
-            maxSwimVelocity = BaseMaxSwimVelocity * Menu.Values.Player.SpeedMultiplier;
+            walkSpeed = BaseWalkSpeed * Menu.Values.Self.SpeedMultiplier;
+            runSpeed = BaseRunSpeed * Menu.Values.Self.SpeedMultiplier;
+            jumpHeight = BaseJumpHeight * Menu.Values.Self.JumpMultiplier;
+            crouchSpeed = BaseCrouchSpeed * Menu.Values.Self.SpeedMultiplier;
+            strafeSpeed = BaseStrafeSpeed * Menu.Values.Self.SpeedMultiplier;
+            swimmingSpeed = BaseSwimmingSpeed * Menu.Values.Self.SpeedMultiplier;
+            maxSwimVelocity = BaseMaxSwimVelocity * Menu.Values.Self.SpeedMultiplier;
 
             if (!Menu.Values.Other.FreeCam)
             {
-                if (Menu.Values.Player.FlyMode && !PushingSled)
+                if (Menu.Values.Self.FlyMode && !PushingSled)
                 {
                     rb.useGravity = false;
-                    if (Menu.Values.Player.NoClip)
+                    if (Menu.Values.Self.NoClip)
                     {
                         if (!LastNoClip)
                         {
@@ -104,15 +104,15 @@ namespace GriefClientPro.Overwrites
                         new Vector3(Input.GetAxis("Horizontal"),
                             0f,
                             Input.GetAxis("Vertical")
-                            ) * multiplier * Menu.Values.Player.SpeedMultiplier);
+                            ) * multiplier * Menu.Values.Self.SpeedMultiplier);
                     var velocity = rb.velocity;
                     if (button3)
                     {
-                        velocity.y -= multiplier * Menu.Values.Player.SpeedMultiplier;
+                        velocity.y -= multiplier * Menu.Values.Self.SpeedMultiplier;
                     }
                     if (button1)
                     {
-                        velocity.y += multiplier * Menu.Values.Player.SpeedMultiplier;
+                        velocity.y += multiplier * Menu.Values.Self.SpeedMultiplier;
                     }
                     var force = vector3 - velocity;
                     rb.AddForce(force, ForceMode.VelocityChange);

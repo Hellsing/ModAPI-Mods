@@ -15,7 +15,7 @@ namespace GriefClientPro.KeyActions
         public static int ActionsPerSecond { get; set; } = 100;
 
         public List<Craft_Structure> CurrentQueue { get; set; }
-        public Dictionary<Craft_Structure, int> OverflowDictionary { get; set; } 
+        public Dictionary<Craft_Structure, int> OverflowDictionary { get; set; }
 
         private int _lastAction;
 
@@ -44,7 +44,7 @@ namespace GriefClientPro.KeyActions
                 }
             }
 
-            if (Menu.Values.Player.InstantBuild && ModAPI.Input.GetButton("InstantBuild"))
+            if (Menu.Values.Self.InstantBuild && ModAPI.Input.GetButton("InstantBuild"))
             {
                 var ray = Camera.main.ScreenPointToRay(new Vector3(Screen.width / 2f, Screen.height / 2f, 0f));
                 ray.origin += Camera.main.transform.forward * 1f;
@@ -100,8 +100,8 @@ namespace GriefClientPro.KeyActions
                                     var addIngredient = AddIngredient.Create(GlobalTargets.OnlyServer);
                                     addIngredient.IngredientNum = itemNumber;
                                     addIngredient.ItemId = requiredItems._itemID;
-                                    addIngredient.Construction = structure.GetComponentInParent<BoltEntity>();
-                                    addIngredient.Send();
+                                    addIngredient.Construction = structure.entity;
+                                    PacketQueue.Add(addIngredient);
                                 }
                                 else
                                 {

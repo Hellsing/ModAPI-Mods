@@ -81,13 +81,25 @@ namespace GriefClientPro.Utils
             {
                 if (message.Length == 1)
                 {
+                    // Write to AppData folder
                     QueuedLines.Add(message[0]);
+
+                    // Write to ModAPI log file
+                    ModAPI.Log.Write(message[0]);
                 }
                 else if (message.Length > 1)
                 {
                     var messages = new List<string>(message);
                     messages.Reverse();
+
+                    // Write to AppData folder
                     QueuedLines.AddRange(messages);
+
+                    // Write to ModAPI log file
+                    foreach (var line in messages)
+                    {
+                        ModAPI.Log.Write(line);
+                    }
                 }
             }
 

@@ -45,6 +45,10 @@
       <HintPath>../../../modlib/TheForest/TheForest_data/Managed/Assembly-UnityScript.dll</HintPath>
       <Private>False</Private>
     </Reference>
+<Reference Include="SteamworksManaged">
+      <HintPath>../../../modlib/TheForest/TheForest_data/Managed/SteamworksManaged.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
 <Reference Include="Boo.Lang">
       <HintPath>../../../modlib/TheForest/TheForest_data/Managed/Boo.Lang.dll</HintPath>
       <Private>False</Private>
@@ -176,16 +180,17 @@
 <Compile Include="KeyManager.cs"  />
 <Compile Include="KillAllPlayers.cs"  />
 <Compile Include="Menu.cs"  />
-<Compile Include="Overwrites\BoltPlayerSetupEx.cs"  />
 <Compile Include="Overwrites\ChatBoxEx.cs"  />
 <Compile Include="Overwrites\CoopVoiceEx.cs"  />
+<Compile Include="Overwrites\KeepAboveTerrainEx.cs"  />
 <Compile Include="Overwrites\PlayerInventoryEx.cs"  />
-<Compile Include="PunishKickBan.cs"  />
+<Compile Include="PacketQueue.cs"  />
+<Compile Include="PlayerManager.cs"  />
+<Compile Include="Overwrites\CoopClientCallbacksEx.cs"  />
 <Compile Include="Utils\BoltPrefabsHelper.cs"  />
 <Compile Include="Utils\Extensions.cs"  />
 <Compile Include="Utils\Logger.cs"  />
 <Compile Include="NameGenerator.cs"  />
-<Compile Include="Overwrites\BuildingRepairEx.cs"  />
 <Compile Include="Overwrites\EnemyHealthEx.cs"  />
 <Compile Include="Overwrites\FirstPersonCharacterEx.cs"  />
 <Compile Include="GriefClientPro.cs"  />

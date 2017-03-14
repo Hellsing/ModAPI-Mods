@@ -5,21 +5,17 @@ using GriefClientPro.Utils;
 using TheForest.UI.Multiplayer;
 using TheForest.Utils;
 using UnityEngine;
-using Random = System.Random;
 
 namespace GriefClientPro.Overwrites
 {
     public class ChatBoxEx : ChatBox
     {
-        private Random _random;
-        private Random Random => _random ?? (_random = new Random(DateTime.Now.Millisecond));
+        public const string Prefix = "<ツ> ";
 
         public override void OnSubmit()
         {
             if (!string.IsNullOrEmpty(_input.value))
             {
-                //Logger.Info("Trying to submit: {0}", _input.value);
-
                 try
                 {
                     if (!BoltNetwork.isRunning)
@@ -28,20 +24,20 @@ namespace GriefClientPro.Overwrites
                     }
 
                     // Check if player is detached
-                    var detached = LocalPlayer.GameObject != null && LocalPlayer.GameObject.GetComponent<BoltEntity>() != null && !LocalPlayer.GameObject.GetComponent<BoltEntity>().isAttached;
-                    if (detached)
+                    var detached = LocalPlayer.GameObject?.GetComponent<BoltEntity>()?.isAttached;
+                    if (detached.HasValue && !detached.Value)
                     {
                         // Pick a random player on the server
                         var player = Players.Keys.ToList().Shuffle()[0];
 
                         // Write with player name
-                        var chatEvent = ChatEvent.Create(GlobalTargets.OnlyServer);
-                        chatEvent.Message = "<ツ> " + _input.value;
+                        var chatEvent = ChatEvent.Create(GlobalTargets.Others);
+                        chatEvent.Message = Prefix + _input.value;
                         chatEvent.Sender = player;
                         chatEvent.Send();
 
                         // Display locally
-                        AddLine(player, chatEvent.Message);
+                        AddLine(player, chatEvent.Message, false);
                     }
                     else
                     {

@@ -7,7 +7,7 @@ namespace GriefClientPro
     {
         public static LocalizedHitData GetLocalizedHitData(LocalizedHitData data)
         {
-            return Menu.Values.Player.InstaDestroy ? new LocalizedHitData(data._position, 100000) : data;
+            return Menu.Values.Self.InstaDestroy ? new LocalizedHitData(data._position, 100000) : data;
         }
     }
 

@@ -4,7 +4,7 @@
     {
         public override void HitReal(int damage)
         {
-            if (Menu.Values.Player.InstaKill)
+            if (Menu.Values.Self.InstaKill)
             {
                 base.HitReal(damage * 1000);
             }

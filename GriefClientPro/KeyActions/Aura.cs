@@ -1,6 +1,6 @@
 ﻿using System;
-using GriefClientPro.Overwrites;
-using TheForest.Buildings.World;
+using GriefClientPro.Utils;
+using TheForest.Buildings.Interfaces;
 using TheForest.Utils;
 using UnityEngine;
 
@@ -56,13 +56,65 @@ namespace GriefClientPro.KeyActions
                     {
                         if (Enabled.RepairBuildings)
                         {
-                            var buildingRepair = hit.collider.GetComponent<BuildingRepair>();
-                            buildingRepair?.RepairBuildingInstantly();
+                            var entity = hit.collider.GetComponent<BoltEntity>();
+                            if (entity != null && entity.isAttached && entity.StateIs<IBuildingDestructibleState>() && entity.GetState<IBuildingDestructibleState>().repairTrigger)
+                            {
+                                Logger.Info("Found destructable structure!");
+
+                                var structure = entity.GetComponentInChildren<TheForest.Buildings.World.BuildingHealth>() ??
+                                                entity.GetComponentInChildren<TheForest.Buildings.World.FoundationHealth>() as IRepairableStructure;
+
+                                if (structure != null)
+                                {
+                                    Logger.Info("Found repairable structure!");
+
+                                    var missingMaterials = structure.CalcTotalRepairMaterial() - structure.RepairMaterial;
+                                    var missingLogs = structure.CollapsedLogs - structure.RepairLogs;
+
+                                    if (missingMaterials == 0 && missingLogs == 0)
+                                    {
+                                        missingMaterials = 1;
+                                        missingLogs = 1;
+                                    }
+
+                                    if (missingMaterials > 0)
+                                    {
+                                        for (var i = 0; i < missingMaterials; i++)
+                                        {
+                                            structure.AddRepairMaterial(false);
+                                        }
+                                    }
+                                    if (missingLogs > 0)
+                                    {
+                                        for (var i = 0; i < missingLogs; i++)
+                                        {
+                                            structure.AddRepairMaterial(true);
+                                        }
+                                    }
+                                }
+                            }
                         }
                         if (Enabled.KillEnemies)
                         {
-                            var enemy = hit.collider.GetComponent<EnemyHealth>();
-                            enemy?.SendMessage("Hit", 100);
+                            var entity = hit.collider.GetComponent<BoltEntity>();
+                            if (entity != null && entity.isAttached && (entity.StateIs<IMutantState>() || entity.StateIs<IAnimalState>() || entity.StateIs<IAnimalDeerState>()))
+                            {
+                                try
+                                {
+                                    var playerHitEnemy = PlayerHitEnemy.Create(Bolt.GlobalTargets.OnlyServer);
+                                    playerHitEnemy.Target = entity;
+                                    playerHitEnemy.Burn = true;
+                                    playerHitEnemy.getStealthAttack = true;
+                                    playerHitEnemy.Hit = 1000;
+                                    playerHitEnemy.takeDamage = 1000;
+                                    playerHitEnemy.HitAxe = true;
+                                    playerHitEnemy.Send();
+                                }
+                                catch (Exception)
+                                {
+                                    // ignored
+                                }
+                            }
                         }
                         if (Enabled.KillPlayers)
                         {

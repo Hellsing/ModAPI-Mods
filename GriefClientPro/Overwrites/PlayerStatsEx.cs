@@ -7,7 +7,7 @@ namespace GriefClientPro.Overwrites
         [Priority(1000)]
         protected override void hitFallDown()
         {
-            if (!Menu.Values.Player.GodMode)
+            if (!Menu.Values.Self.GodMode)
             {
                 base.hitFallDown();
             }
@@ -16,7 +16,7 @@ namespace GriefClientPro.Overwrites
         [Priority(1000)]
         protected override void HitFire()
         {
-            if (!Menu.Values.Player.GodMode)
+            if (!Menu.Values.Self.GodMode)
             {
                 base.HitFire();
             }
@@ -25,7 +25,7 @@ namespace GriefClientPro.Overwrites
         [Priority(1000)]
         public override void hitFromEnemy(int getDamage)
         {
-            if (!Menu.Values.Player.GodMode)
+            if (!Menu.Values.Self.GodMode)
             {
                 base.hitFromEnemy(getDamage);
             }
@@ -34,7 +34,7 @@ namespace GriefClientPro.Overwrites
         [Priority(1000)]
         public override void HitShark(int damage)
         {
-            if (!Menu.Values.Player.GodMode)
+            if (!Menu.Values.Self.GodMode)
             {
                 base.HitShark(damage);
             }
@@ -43,7 +43,7 @@ namespace GriefClientPro.Overwrites
         [Priority(1000)]
         protected override void FallDownDead()
         {
-            if (!Menu.Values.Player.GodMode)
+            if (!Menu.Values.Self.GodMode)
             {
                 base.FallDownDead();
             }
@@ -52,7 +52,7 @@ namespace GriefClientPro.Overwrites
         [Priority(1000)]
         protected override void Fell()
         {
-            if (!Menu.Values.Player.GodMode)
+            if (!Menu.Values.Self.GodMode)
             {
                 base.Fell();
             }
@@ -61,7 +61,7 @@ namespace GriefClientPro.Overwrites
         [Priority(1000)]
         protected override void HitFromPlayMaker(int damage)
         {
-            if (!Menu.Values.Player.GodMode)
+            if (!Menu.Values.Self.GodMode)
             {
                 base.HitFromPlayMaker(damage);
             }
@@ -69,7 +69,7 @@ namespace GriefClientPro.Overwrites
 
         protected override void Update()
         {
-            if (Menu.Values.Player.GodMode)
+            if (Menu.Values.Self.GodMode)
             {
                 IsBloody = false;
                 FireWarmth = true;
@@ -89,7 +89,7 @@ namespace GriefClientPro.Overwrites
 
         protected override void KillPlayer()
         {
-            if (!Menu.Values.Player.GodMode)
+            if (!Menu.Values.Self.GodMode)
             {
                 base.KillPlayer();
             }
@@ -97,7 +97,7 @@ namespace GriefClientPro.Overwrites
 
         public override void HitFood()
         {
-            if (!Menu.Values.Player.GodMode)
+            if (!Menu.Values.Self.GodMode)
             {
                 base.HitFood();
             }
@@ -105,7 +105,7 @@ namespace GriefClientPro.Overwrites
 
         public override void HitFoodDelayed(int damage)
         {
-            if (!Menu.Values.Player.GodMode)
+            if (!Menu.Values.Self.GodMode)
             {
                 base.HitFoodDelayed(damage);
             }

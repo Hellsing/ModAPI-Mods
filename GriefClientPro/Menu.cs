@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using GriefClientPro.KeyActions;
+using GriefClientPro.Utils;
 using TheForest.UI.Multiplayer;
 using TheForest.Utils;
 using UnityEngine;
@@ -22,10 +23,13 @@ namespace GriefClientPro
 
         public static class Values
         {
-            public static class Player
+            public static class Self
             {
+                public static Vector2 ScrollPosition = Vector2.zero;
+
                 public static bool Visible;
                 public static bool GodMode = true;
+                public static bool FireTrail;
                 public static bool FlyMode;
                 public static bool NoClip;
                 public static bool InstantTree;
@@ -76,6 +80,8 @@ namespace GriefClientPro
         private static float Y { get; set; }
         private static Rect MenuRect { get; set; }
 
+        private static Dictionary<ulong, Vector3> LastFirePositions { get; } = new Dictionary<ulong, Vector3>();
+
         // ReSharper disable once UnusedMember.Local
         private void Start()
         {
@@ -110,10 +116,10 @@ namespace GriefClientPro
             CurrentTab = GUI.Toolbar(new Rect(MenuRect.xMin, MenuRect.yMin, MenuRect.width, ToolbarHeight), CurrentTab,
                 new[]
                 {
-                    new GUIContent("Player"),
-                    new GUIContent("World"),
-                    new GUIContent("Stats"),
-                    new GUIContent("Other"),
+                    new GUIContent(nameof(Values.Self)),
+                    new GUIContent(nameof(Values.World)),
+                    new GUIContent("Players"),
+                    new GUIContent(nameof(Values.Other)),
                     new GUIContent("Sphere"),
                     new GUIContent("PermaKill"),
                     new GUIContent("Aura")
@@ -125,225 +131,307 @@ namespace GriefClientPro
             // ReSharper disable once SwitchStatementMissingSomeCases
             switch (CurrentTab)
             {
-                #region Player
+                    #region Self
 
                 case 0:
+                {
+                    Y -= Padding;
+                    //GUI.Box(new Rect(MenuRect.xMin, Y - 1f, Width - 8f, Height - ToolbarHeight), "", GUI.skin.box);
+                    Values.Self.ScrollPosition = GUI.BeginScrollView(new Rect(MenuRect.xMin, Y, Width, Height - ToolbarHeight - 5), Values.Self.ScrollPosition, new Rect(0, 0, Width - 24, Height * 2));
+
+                    Y = Padding;
+
+                    AddLabel("OPTIONS", increaseY: true, autoAlign: false);
+
+                    AddLabel("Visible:", autoAlign: false);
+                    AddCheckBox(ref Values.Self.Visible, increaseY: true, autoAlign: false);
+
+                    AddLabel("Fire trail:", autoAlign: false);
+                    AddCheckBox(ref Values.Self.FireTrail, increaseY: true, autoAlign: false);
+
+                    AddLabel("God mode:", autoAlign: false);
+                    AddCheckBox(ref Values.Self.GodMode, increaseY: true, autoAlign: false);
+
+                    AddLabel("Fly mode:", autoAlign: false);
+                    AddCheckBox(ref Values.Self.FlyMode, increaseY: true, autoAlign: false);
+
+                    if (Values.Self.FlyMode)
                     {
-                        AddLabel("Visible:");
-                        AddCheckBox(ref Values.Player.Visible, increaseY: true);
-
-                        AddLabel("God mode:");
-                        AddCheckBox(ref Values.Player.GodMode, increaseY: true);
-
-                        AddLabel("Fly mode:");
-                        AddCheckBox(ref Values.Player.FlyMode, increaseY: true);
-
-                        if (Values.Player.FlyMode)
-                        {
-                            AddLabel("Noclip:");
-                            AddCheckBox(ref Values.Player.NoClip, increaseY: true);
-                        }
-
-                        AddLabel("InstantTree:");
-                        AddCheckBox(ref Values.Player.InstantTree, increaseY: true);
-
-                        AddLabel("InstantBuild:");
-                        AddCheckBox(ref Values.Player.InstantBuild, increaseY: true);
-
-                        AddLabel("InstantKill:");
-                        AddCheckBox(ref Values.Player.InstaKill, increaseY: true);
-
-                        AddLabel("InstantDestroy:");
-                        AddCheckBox(ref Values.Player.InstaDestroy, increaseY: true);
-
-                        AddLabel("Move speed:");
-                        AddSlider(ref Values.Player.SpeedMultiplier, 1, 10, increaseY: true);
-
-                        AddLabel("Jump power:");
-                        AddSlider(ref Values.Player.JumpMultiplier, 1, 10, increaseY: true);
-
-                        break;
+                        AddLabel("Noclip:", autoAlign: false);
+                        AddCheckBox(ref Values.Self.NoClip, increaseY: true, autoAlign: false);
                     }
 
-                #endregion
+                    AddLabel("InstantTree:", autoAlign: false);
+                    AddCheckBox(ref Values.Self.InstantTree, increaseY: true, autoAlign: false);
 
-                #region World
+                    AddLabel("InstantBuild:", autoAlign: false);
+                    AddCheckBox(ref Values.Self.InstantBuild, increaseY: true, autoAlign: false);
+
+                    AddLabel("InstantKill:", autoAlign: false);
+                    AddCheckBox(ref Values.Self.InstaKill, increaseY: true, autoAlign: false);
+
+                    AddLabel("InstantDestroy:", autoAlign: false);
+                    AddCheckBox(ref Values.Self.InstaDestroy, increaseY: true, autoAlign: false);
+
+                    AddLabel("Move speed:", autoAlign: false);
+                    AddSlider(ref Values.Self.SpeedMultiplier, 1, 10, increaseY: true, autoAlign: false);
+
+                    AddLabel("Jump power:", autoAlign: false);
+                    AddSlider(ref Values.Self.JumpMultiplier, 1, 10, increaseY: true, autoAlign: false);
+
+                    Y += Padding;
+                    AddLabel("STATS", autoAlign: false);
+
+                    const float checkBoxPosition = 360;
+                    AddLabel("Fix", checkBoxPosition, increaseY: true, autoAlign: false);
+
+                    AddStatSlider("Health:", ref Values.Stats.FixedHealth, ref LocalPlayer.Stats.Health, 0, 100, ref Values.Stats.FixHealth, checkBoxPosition, false);
+                    AddStatSlider("Battery charge:", ref Values.Stats.FixedBatteryCharge, ref LocalPlayer.Stats.BatteryCharge, 0, 100, ref Values.Stats.FixBatteryCharge, checkBoxPosition, false);
+                    AddStatSlider("Fullness:", ref Values.Stats.FixedFullness, ref LocalPlayer.Stats.Fullness, 0, 1, ref Values.Stats.FixFullness, checkBoxPosition, false);
+                    AddStatSlider("Stamina:", ref Values.Stats.FixedStamina, ref LocalPlayer.Stats.Stamina, 0, 100, ref Values.Stats.FixStamina, checkBoxPosition, false);
+                    AddStatSlider("Energy:", ref Values.Stats.FixedEnergy, ref LocalPlayer.Stats.Energy, 0, 100, ref Values.Stats.FixEnergy, checkBoxPosition, false);
+                    AddStatSlider("Thirst:", ref Values.Stats.FixedThirst, ref LocalPlayer.Stats.Thirst, 0, 1, ref Values.Stats.FixThirst, checkBoxPosition, false);
+                    AddStatSlider("Starvation:", ref Values.Stats.FixedStarvation, ref LocalPlayer.Stats.Starvation, 0, 1, ref Values.Stats.FixStarvation, checkBoxPosition, false);
+                    AddStatSlider("Body temp:", ref Values.Stats.FixedBodyTemp, ref LocalPlayer.Stats.BodyTemp, 10, 60, ref Values.Stats.FixBodyTemp, checkBoxPosition, false);
+
+                    GUI.EndScrollView();
+
+                    break;
+                }
+
+                    #endregion
+
+                    #region World
 
                 case 1:
+                {
+                    AddLabel("Time Settings", Padding * 2, increaseY: true);
+
+                    AddLabel("Freeze time:");
+                    AddCheckBox(ref Values.World.FreezeTime, increaseY: true);
+
+                    AddLabel("Speed of time:");
+                    AddSlider(ref TheForestAtmosphere.Instance.RotationSpeed, 0, 10, increaseY: true);
+                    if (AddButton("Reset", 270, 100, increaseY: true))
                     {
-                        AddLabel("Time Settings", Padding * 2, increaseY: true);
-
-                        AddLabel("Freeze time:");
-                        AddCheckBox(ref Values.World.FreezeTime, increaseY: true);
-
-                        AddLabel("Speed of time:");
-                        AddSlider(ref TheForestAtmosphere.Instance.RotationSpeed, 0, 10, increaseY: true);
-                        if (AddButton("Reset", 270, 100, increaseY: true))
-                        {
-                            TheForestAtmosphere.Instance.RotationSpeed = 0.13f;
-                        }
-
-                        AddLabel("Time:");
-                        AddSlider(ref Values.World.TimeOfDay, 0, 360, increaseY: true);
-
-                        AddLabel("Cave light:");
-                        AddSlider(ref Values.World.CaveLight, 0, 1, increaseY: true);
-
-                        AddLabel("Weather Settings", Padding * 2, increaseY: true);
-
-                        AddLabel("Freeze Weather:");
-                        AddCheckBox(ref Values.World.FreezeWeather, increaseY: true);
-
-                        if (AddButton("Clear Weather", width: 180, increaseY: true))
-                        {
-                            Values.World.ForceWeather = 0;
-                        }
-
-                        if (AddButton("Cloudy", width: 180, increaseY: true))
-                        {
-                            Values.World.ForceWeather = 4;
-                        }
-
-                        if (AddButton("Light Rain", width: 180, increaseY: true))
-                        {
-                            Values.World.ForceWeather = 1;
-                        }
-
-                        if (AddButton("Medium Rain", width: 180, increaseY: true))
-                        {
-                            Values.World.ForceWeather = 2;
-                        }
-
-                        if (AddButton("Heavy Rain", width: 180, increaseY: true))
-                        {
-                            Values.World.ForceWeather = 3;
-                        }
-
-                        break;
+                        TheForestAtmosphere.Instance.RotationSpeed = 0.13f;
                     }
 
-                #endregion
+                    AddLabel("Time:");
+                    AddSlider(ref Values.World.TimeOfDay, 0, 360, increaseY: true);
 
-                #region Stats
+                    AddLabel("Cave light:");
+                    AddSlider(ref Values.World.CaveLight, 0, 1, increaseY: true);
+
+                    AddLabel("Weather Settings", Padding * 2, increaseY: true);
+
+                    AddLabel("Freeze Weather:");
+                    AddCheckBox(ref Values.World.FreezeWeather, increaseY: true);
+
+                    if (AddButton("Clear Weather", width: 180, increaseY: true))
+                    {
+                        Values.World.ForceWeather = 0;
+                    }
+
+                    if (AddButton("Cloudy", width: 180, increaseY: true))
+                    {
+                        Values.World.ForceWeather = 4;
+                    }
+
+                    if (AddButton("Light Rain", width: 180, increaseY: true))
+                    {
+                        Values.World.ForceWeather = 1;
+                    }
+
+                    if (AddButton("Medium Rain", width: 180, increaseY: true))
+                    {
+                        Values.World.ForceWeather = 2;
+                    }
+
+                    if (AddButton("Heavy Rain", width: 180, increaseY: true))
+                    {
+                        Values.World.ForceWeather = 3;
+                    }
+
+                    break;
+                }
+
+                    #endregion
+
+                    #region Players
 
                 case 2:
+                {
+                    // Kill, Fire trail, teleport, exploit, trap
+                    AddLabel("Player Name");
+                    AddLabel("Kill", 160);
+                    AddLabel("Fire trail", 220, increaseY: true);
+
+                    foreach (var player in GriefClientPro.PlayerManager.Players)
                     {
-                        const float checkBoxPosition = 360;
-                        AddLabel("Fix", checkBoxPosition, increaseY: true);
+                        // Add player name
+                        AddLabel(player.Name);
 
-                        AddStatSlider("Health:", ref Values.Stats.FixedHealth, ref LocalPlayer.Stats.Health, 0, 100, ref Values.Stats.FixHealth, checkBoxPosition);
-                        AddStatSlider("Battery charge:", ref Values.Stats.FixedBatteryCharge, ref LocalPlayer.Stats.BatteryCharge, 0, 100, ref Values.Stats.FixBatteryCharge, checkBoxPosition);
-                        AddStatSlider("Fullness:", ref Values.Stats.FixedFullness, ref LocalPlayer.Stats.Fullness, 0, 1, ref Values.Stats.FixFullness, checkBoxPosition);
-                        AddStatSlider("Stamina:", ref Values.Stats.FixedStamina, ref LocalPlayer.Stats.Stamina, 0, 100, ref Values.Stats.FixStamina, checkBoxPosition);
-                        AddStatSlider("Energy:", ref Values.Stats.FixedEnergy, ref LocalPlayer.Stats.Energy, 0, 100, ref Values.Stats.FixEnergy, checkBoxPosition);
-                        AddStatSlider("Thirst:", ref Values.Stats.FixedThirst, ref LocalPlayer.Stats.Thirst, 0, 1, ref Values.Stats.FixThirst, checkBoxPosition);
-                        AddStatSlider("Starvation:", ref Values.Stats.FixedStarvation, ref LocalPlayer.Stats.Starvation, 0, 1, ref Values.Stats.FixStarvation, checkBoxPosition);
-                        AddStatSlider("Body temp:", ref Values.Stats.FixedBodyTemp, ref LocalPlayer.Stats.BodyTemp, 10, 60, ref Values.Stats.FixBodyTemp, checkBoxPosition);
+                        // Add kill checkbox
+                        if (GUI.Toggle(new Rect(MenuRect.xMin + Padding + 160, Y, 20, 20), GriefClientPro.KillAllPlayers.PermaKillPlayers.Contains(player.SteamId), ""))
+                        {
+                            GriefClientPro.KillAllPlayers.AddPlayerToPermaKill(player);
+                        }
+                        else
+                        {
+                            GriefClientPro.KillAllPlayers.RemovePlayerToPermaKill(player);
+                        }
 
-                        break;
+                        // Add fire trail checkbox
+                        if (GUI.Toggle(new Rect(MenuRect.xMin + Padding + 220, Y, 20, 20), LastFirePositions.ContainsKey(player.SteamId), ""))
+                        {
+                            if (!LastFirePositions.ContainsKey(player.SteamId))
+                            {
+                                LastFirePositions.Add(player.SteamId, Vector3.zero);
+                            }
+                        }
+                        else
+                        {
+                            LastFirePositions.Remove(player.SteamId);
+                        }
+
+                        // Add teleport button
+                        if (AddButton("Teleport", 300, 75))
+                        {
+                            LocalPlayer.Transform.position = player.Position;
+                        }
+
+                        // Add exploit button
+                        if (AddButton("Exploit", 385, 75))
+                        {
+                            var requestDestroy = RequestDestroy.Create(Bolt.GlobalTargets.Others);
+                            requestDestroy.Entity = player.Entity;
+                            PacketQueue.Add(requestDestroy);
+                        }
+
+                        // Add trap extreme button
+                        if (AddButton("Trap", 470, 60))
+                        {
+                            const int size = 5;
+                            for (var x = -size; x < size; x++)
+                            {
+                                for (var y = -1; y < size / 2; y++)
+                                {
+                                    for (var z = -size; z < size; z++)
+                                    {
+                                        var offset = new Vector3(x * 8, y * 8, z * 8);
+                                        var position = player.Position + offset;
+
+                                        // Spawn the traps
+                                        BoltPrefabsHelper.Spawn(BoltPrefabs.Trap_TripWireExplosiveBuilt, position, Quaternion.identity);
+                                    }
+                                }
+                            }
+                        }
+
+                        Y += StepY;
                     }
 
-                #endregion
+                    break;
+                }
 
-                #region Other
+                    #endregion
+
+                    #region Other
 
                 case 3:
-                    {
-                        AddLabel("Free cam:");
-                        AddCheckBox(ref Values.Other.FreeCam, increaseY: true);
+                {
+                    AddLabel("Free cam:");
+                    AddCheckBox(ref Values.Other.FreeCam, increaseY: true);
 
-                        AddLabel("InstantRevive:");
-                        AddCheckBox(ref Values.Other.InstaRevive, increaseY: true);
+                    AddLabel("InstantRevive:");
+                    AddCheckBox(ref Values.Other.InstaRevive, increaseY: true);
 
-                        break;
-                    }
+                    break;
+                }
 
-                #endregion
+                    #endregion
 
-                #region Sphere
+                    #region Sphere
 
                 case 4:
-                    {
-                        AddLabel("Enabled actions", Padding * 2, increaseY: true);
-                        Y += Padding;
+                {
+                    AddLabel("Enabled actions", Padding * 2, increaseY: true);
+                    Y += Padding;
 
-                        AddLabel("BluePrints:");
-                        AddCheckBox(ref SphereAction.Enabled.BluePrints, increaseY: true);
-                        AddLabel("BreakableCrates:");
-                        AddCheckBox(ref SphereAction.Enabled.BreakableCrates, increaseY: true);
-                        AddLabel("Buildings:");
-                        AddCheckBox(ref SphereAction.Enabled.Buildings, increaseY: true);
-                        AddLabel("Bushes:");
-                        AddCheckBox(ref SphereAction.Enabled.Bushes, increaseY: true);
-                        AddLabel("SuitCases:");
-                        AddCheckBox(ref SphereAction.Enabled.SuitCases, increaseY: true);
-                        AddLabel("Trees:");
-                        AddCheckBox(ref SphereAction.Enabled.Trees, increaseY: true);
-                        AddLabel("TreeStumps:");
-                        AddCheckBox(ref SphereAction.Enabled.TreeStumps, increaseY: true);
-                        AddLabel("KillPlayers:");
-                        AddCheckBox(ref SphereAction.Enabled.KillPlayers, increaseY: true);
+                    AddLabel("BluePrints:");
+                    AddCheckBox(ref SphereAction.Enabled.BluePrints, increaseY: true);
+                    AddLabel("BreakableCrates:");
+                    AddCheckBox(ref SphereAction.Enabled.BreakableCrates, increaseY: true);
+                    AddLabel("Buildings:");
+                    AddCheckBox(ref SphereAction.Enabled.Buildings, increaseY: true);
+                    AddLabel("Bushes:");
+                    AddCheckBox(ref SphereAction.Enabled.Bushes, increaseY: true);
+                    AddLabel("SuitCases:");
+                    AddCheckBox(ref SphereAction.Enabled.SuitCases, increaseY: true);
+                    AddLabel("Trees:");
+                    AddCheckBox(ref SphereAction.Enabled.Trees, increaseY: true);
+                    AddLabel("TreeStumps:");
+                    AddCheckBox(ref SphereAction.Enabled.TreeStumps, increaseY: true);
+                    AddLabel("KillPlayers:");
+                    AddCheckBox(ref SphereAction.Enabled.KillPlayers, increaseY: true);
 
-                        break;
-                    }
+                    break;
+                }
 
-                #endregion
+                    #endregion
 
-                #region PermaKill
+                    #region PermaKill
 
                 case 5:
-                    {
-                        AddLabel("Kill selected players", Padding * 2, increaseY: true);
-                        Y += Padding;
+                {
+                    break;
+                }
 
-                        var currentPlayers = new HashSet<string>(GriefClientPro.KillAllPlayers.PermaKillPlayers);
-                        GriefClientPro.KillAllPlayers.PermaKillPlayers.Clear();
-                        foreach (
-                            var playerName in
-                                BoltNetwork.entities.Where(current => current.StateIs<IPlayerState>() && current.GetState<IPlayerState>().name != GriefClientPro.PlayerName)
-                                    .Select(current => current.GetState<IPlayerState>().name))
-                        {
-                            AddLabel(playerName + ":");
-                            if (GUI.Toggle(new Rect(MenuRect.xMin + Padding + 160, Y, 20, 30), currentPlayers.Contains(playerName), ""))
-                            {
-                                GriefClientPro.KillAllPlayers.PermaKillPlayers.Add(playerName);
-                            }
-                            Y += StepY;
-                        }
-                        break;
-                    }
+                    #endregion
 
-                #endregion
-
-                #region Aura
+                    #region Aura
 
                 case 6:
-                    {
-                        AddLabel("Execute selected actions around camera", increaseY: true);
-                        AddLabel("Status: " + (Aura.Active ? "Active" : "Offline"), Padding * 3, increaseY: true);
-                        Y += Padding;
+                {
+                    AddLabel("Execute selected actions around camera", increaseY: true);
+                    AddLabel("Status: " + (Aura.Active ? "Active" : "Offline"), Padding * 3, increaseY: true);
+                    Y += Padding;
 
-                        AddLabel("Radius: " + Math.Round(Aura.Radius));
-                        Aura.Radius = AddSlider(ref Aura._radius, Aura.MinRadius, Aura.MaxRadius, width: MenuRect.width - Padding * 3 - 160, increaseY: true);
+                    AddLabel("Radius: " + Math.Round(Aura.Radius));
+                    Aura.Radius = AddSlider(ref Aura._radius, Aura.MinRadius, Aura.MaxRadius, width: MenuRect.width - Padding * 3 - 160, increaseY: true);
 
-                        AddLabel("KillEnemies:");
-                        AddCheckBox(ref Aura.Enabled.KillEnemies, increaseY: true);
+                    AddLabel("KillEnemies:");
+                    AddCheckBox(ref Aura.Enabled.KillEnemies, increaseY: true);
 
-                        AddLabel("KillPlayers:");
-                        AddCheckBox(ref Aura.Enabled.KillPlayers, increaseY: true);
+                    AddLabel("KillPlayers:");
+                    AddCheckBox(ref Aura.Enabled.KillPlayers, increaseY: true);
 
-                        AddLabel("RepairBuildings:");
-                        AddCheckBox(ref Aura.Enabled.RepairBuildings, increaseY: true);
-                        break;
-                    }
+                    AddLabel("RepairBuildings:");
+                    AddCheckBox(ref Aura.Enabled.RepairBuildings, increaseY: true);
+                    break;
+                }
 
                     #endregion
             }
         }
 
+        // ReSharper disable once UnusedMember.Local
+        private void Update()
+        {
+            foreach (var player in
+                GriefClientPro.PlayerManager.Players.Where(
+                    player => LastFirePositions.ContainsKey(player.SteamId) &&
+                              Vector3.Distance(LastFirePositions[player.SteamId], player.Position) > 2))
+            {
+                LastFirePositions[player.SteamId] = player.Position;
+                BoltPrefabsHelper.Spawn(BoltPrefabs.Fire, player.Position - new Vector3(0, 4, 0), player.Transform.rotation);
+            }
+        }
+
         private static void OnKeyDown(KeyManager sender, KeyManager.KeyEventArgs args)
         {
-            if (args.Key == KeyManager.Keys.OpenMenu)
+            if (BoltNetwork.isRunning && args.Key == KeyManager.Keys.OpenMenu)
             {
                 // Invert open menu status
                 IsOpen = !IsOpen;
@@ -360,51 +448,59 @@ namespace GriefClientPro
             }
         }
 
-        private static void AddLabel(string text, float x = Padding, float width = 150, float height = 20, bool increaseY = false)
+        private static void AddLabel(string text, float x = Padding, float width = 150, float height = 20, bool increaseY = false, bool autoAlign = true)
         {
-            GUI.Label(new Rect(MenuRect.xMin + Padding + x, Y, width, height), text, LabelStyle);
+            GUI.Label(new Rect((autoAlign ? MenuRect.xMin : 0) + Padding + x, Y, width, height), text, LabelStyle);
             IncreaseY(increaseY);
         }
 
-        private static bool AddCheckBox(ref bool updateValue, float x = 160, float width = 20, float height = 30, bool increaseY = false)
+        private static bool AddCheckBox(ref bool updateValue, float x = 160, float width = 20, float height = 30, bool increaseY = false, bool autoAlign = true)
         {
-            updateValue = GUI.Toggle(new Rect(MenuRect.xMin + Padding + x, Y, width, height), updateValue, "");
-            IncreaseY(increaseY);
-            return updateValue;
-        }
-
-        private static float AddSlider(ref float updateValue, float minValue, float maxValue, float x = 160, float width = 210, float height = 30, bool increaseY = false)
-        {
-            updateValue = GUI.HorizontalSlider(new Rect(MenuRect.xMin + Padding + x, Y + 3f, width, height), updateValue, minValue, maxValue);
+            updateValue = GUI.Toggle(new Rect((autoAlign ? MenuRect.xMin : 0) + Padding + x, Y, width, height), updateValue, "");
             IncreaseY(increaseY);
             return updateValue;
         }
 
-        private static bool AddButton(string text, float x = Padding, float width = 180, float height = 20, bool increaseY = false)
+        private static float AddSlider(ref float updateValue, float minValue, float maxValue, float x = 160, float width = 210, float height = 30, bool increaseY = false, bool autoAlign = true)
         {
-            var result = GUI.Button(new Rect(MenuRect.xMin + Padding + x, Y, width, height), text);
+            updateValue = GUI.HorizontalSlider(new Rect((autoAlign ? MenuRect.xMin : 0) + Padding + x, Y + 3f, width, height), updateValue, minValue, maxValue);
+            IncreaseY(increaseY);
+            return updateValue;
+        }
+
+        private static bool AddButton(string text, float x = Padding, float width = 180, float height = 20, bool increaseY = false, bool autoAlign = true)
+        {
+            var result = GUI.Button(new Rect((autoAlign ? MenuRect.xMin : 0) + Padding + x, Y, width, height), text);
             IncreaseY(increaseY);
             return result;
         }
 
-        private static bool AddStatSlider(string text, ref float updateValueActive, ref float updateValueInactive, float min, float max, ref bool updateFixValue, float checkBoxPosition)
+        private static bool AddStatSlider(
+            string text,
+            ref float updateValueActive,
+            ref float updateValueInactive,
+            float min,
+            float max,
+            ref bool updateFixValue,
+            float checkBoxPosition,
+            bool autoAlign = true)
         {
-            AddLabel(text);
+            AddLabel(text, autoAlign: autoAlign);
             if (updateFixValue)
             {
                 if (updateValueActive < 0)
                 {
                     updateValueActive = updateValueInactive;
                 }
-                AddSlider(ref updateValueActive, min, max, width: 160);
+                AddSlider(ref updateValueActive, min, max, width: 160, autoAlign: autoAlign);
             }
             else
             {
                 updateValueActive = -1;
-                AddSlider(ref updateValueInactive, min, max, width: 160);
+                AddSlider(ref updateValueInactive, min, max, width: 160, autoAlign: autoAlign);
             }
-            AddLabel(Mathf.RoundToInt(updateFixValue ? updateValueActive : updateValueInactive).ToString(CultureInfo.InvariantCulture), checkBoxPosition - 30, 40);
-            AddCheckBox(ref updateFixValue, checkBoxPosition, height: 20, increaseY: true);
+            AddLabel(Mathf.RoundToInt(updateFixValue ? updateValueActive : updateValueInactive).ToString(CultureInfo.InvariantCulture), checkBoxPosition - 30, 40, autoAlign: autoAlign);
+            AddCheckBox(ref updateFixValue, checkBoxPosition, height: 20, increaseY: true, autoAlign: autoAlign);
             return updateFixValue;
         }
 

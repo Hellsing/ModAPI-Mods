@@ -12,7 +12,7 @@ namespace GriefClientPro.Utils
                 return LocalPlayer.GameObject.GetComponent<BoltEntity>();
             }
 
-            Menu.Values.Player.Visible = true;
+            Menu.Values.Self.Visible = true;
 
             LocalPlayer.GameObject.AddComponent<BoltPlayerSetup>();
             LocalPlayer.GameObject.AddComponent<BoltEntity>();
@@ -37,7 +37,7 @@ namespace GriefClientPro.Utils
         {
             if (LocalPlayer.Entity != null && LocalPlayer.Entity.isAttached)
             {
-                Menu.Values.Player.Visible = false;
+                Menu.Values.Self.Visible = false;
 
                 BoltNetwork.Detach(LocalPlayer.Entity);
             }
