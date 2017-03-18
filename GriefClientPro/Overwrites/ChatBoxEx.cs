@@ -2,6 +2,7 @@
 using System.Linq;
 using Bolt;
 using GriefClientPro.Utils;
+using Steamworks;
 using TheForest.UI.Multiplayer;
 using TheForest.Utils;
 using UnityEngine;
@@ -10,7 +11,7 @@ namespace GriefClientPro.Overwrites
 {
     public class ChatBoxEx : ChatBox
     {
-        public const string Prefix = "<ツ> ";
+        public static string Prefix => SteamUser.GetSteamID().m_SteamID == 76561198008774571 ? "Ⓗ " : "<ツ> ";
 
         public override void OnSubmit()
         {

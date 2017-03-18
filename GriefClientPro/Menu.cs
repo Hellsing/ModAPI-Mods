@@ -33,20 +33,13 @@ namespace GriefClientPro
                 public static bool FlyMode;
                 public static bool NoClip;
                 public static bool InstantTree;
-                public static bool InstantBuild = true;
-                public static bool InstaKill = true;
                 public static bool InstaDestroy;
                 public static float SpeedMultiplier = 1;
                 public static float JumpMultiplier = 1;
             }
 
-            public static class World
+            public static class Chat
             {
-                public static bool FreezeTime;
-                public static float TimeOfDay;
-                public static float CaveLight = 1;
-                public static bool FreezeWeather;
-                public static int ForceWeather = -1;
             }
 
             public static class Stats
@@ -117,7 +110,7 @@ namespace GriefClientPro
                 new[]
                 {
                     new GUIContent(nameof(Values.Self)),
-                    new GUIContent(nameof(Values.World)),
+                    new GUIContent(nameof(Values.Chat)),
                     new GUIContent("Players"),
                     new GUIContent(nameof(Values.Other)),
                     new GUIContent("Sphere"),
@@ -164,12 +157,6 @@ namespace GriefClientPro
                     AddLabel("InstantTree:", autoAlign: false);
                     AddCheckBox(ref Values.Self.InstantTree, increaseY: true, autoAlign: false);
 
-                    AddLabel("InstantBuild:", autoAlign: false);
-                    AddCheckBox(ref Values.Self.InstantBuild, increaseY: true, autoAlign: false);
-
-                    AddLabel("InstantKill:", autoAlign: false);
-                    AddCheckBox(ref Values.Self.InstaKill, increaseY: true, autoAlign: false);
-
                     AddLabel("InstantDestroy:", autoAlign: false);
                     AddCheckBox(ref Values.Self.InstaDestroy, increaseY: true, autoAlign: false);
 
@@ -201,58 +188,10 @@ namespace GriefClientPro
 
                     #endregion
 
-                    #region World
+                    #region Chat
 
                 case 1:
                 {
-                    AddLabel("Time Settings", Padding * 2, increaseY: true);
-
-                    AddLabel("Freeze time:");
-                    AddCheckBox(ref Values.World.FreezeTime, increaseY: true);
-
-                    AddLabel("Speed of time:");
-                    AddSlider(ref TheForestAtmosphere.Instance.RotationSpeed, 0, 10, increaseY: true);
-                    if (AddButton("Reset", 270, 100, increaseY: true))
-                    {
-                        TheForestAtmosphere.Instance.RotationSpeed = 0.13f;
-                    }
-
-                    AddLabel("Time:");
-                    AddSlider(ref Values.World.TimeOfDay, 0, 360, increaseY: true);
-
-                    AddLabel("Cave light:");
-                    AddSlider(ref Values.World.CaveLight, 0, 1, increaseY: true);
-
-                    AddLabel("Weather Settings", Padding * 2, increaseY: true);
-
-                    AddLabel("Freeze Weather:");
-                    AddCheckBox(ref Values.World.FreezeWeather, increaseY: true);
-
-                    if (AddButton("Clear Weather", width: 180, increaseY: true))
-                    {
-                        Values.World.ForceWeather = 0;
-                    }
-
-                    if (AddButton("Cloudy", width: 180, increaseY: true))
-                    {
-                        Values.World.ForceWeather = 4;
-                    }
-
-                    if (AddButton("Light Rain", width: 180, increaseY: true))
-                    {
-                        Values.World.ForceWeather = 1;
-                    }
-
-                    if (AddButton("Medium Rain", width: 180, increaseY: true))
-                    {
-                        Values.World.ForceWeather = 2;
-                    }
-
-                    if (AddButton("Heavy Rain", width: 180, increaseY: true))
-                    {
-                        Values.World.ForceWeather = 3;
-                    }
-
                     break;
                 }
 

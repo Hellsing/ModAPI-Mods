@@ -191,13 +191,10 @@
 <Compile Include="Utils\Extensions.cs"  />
 <Compile Include="Utils\Logger.cs"  />
 <Compile Include="NameGenerator.cs"  />
-<Compile Include="Overwrites\EnemyHealthEx.cs"  />
 <Compile Include="Overwrites\FirstPersonCharacterEx.cs"  />
 <Compile Include="GriefClientPro.cs"  />
 <Compile Include="Overwrites\PlayerStatsEx.cs"  />
-<Compile Include="Overwrites\TheForestAtmosphereEx.cs"  />
 <Compile Include="Overwrites\TreeHealthEx.cs"  />
-<Compile Include="Overwrites\WeatherSystemEx.cs"  />
 <Compile Include="KeyActions\SphereAction.cs"  />
 <Compile Include="Utils\Utility.cs"  />
 

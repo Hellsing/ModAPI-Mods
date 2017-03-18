@@ -35,16 +35,13 @@ namespace GriefClientPro.KeyActions
             // Remove old overflows
             if (OverflowDictionary.Count > 0)
             {
-                foreach (var entry in OverflowDictionary.ToArray())
+                foreach (var entry in OverflowDictionary.ToArray().Where(entry => Environment.TickCount - entry.Value > 5000))
                 {
-                    if (Environment.TickCount - entry.Value > 5000)
-                    {
-                        OverflowDictionary.Remove(entry.Key);
-                    }
+                    OverflowDictionary.Remove(entry.Key);
                 }
             }
 
-            if (Menu.Values.Self.InstantBuild && ModAPI.Input.GetButton("InstantBuild"))
+            if (ModAPI.Input.GetButton("InstantBuild"))
             {
                 var ray = Camera.main.ScreenPointToRay(new Vector3(Screen.width / 2f, Screen.height / 2f, 0f));
                 ray.origin += Camera.main.transform.forward * 1f;

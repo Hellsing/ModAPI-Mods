@@ -46,6 +46,10 @@ namespace GriefClientPro.Overwrites
 
         protected override void FixedUpdate()
         {
+            // Block fall damage while in god mode
+            allowFallDamage = !Menu.Values.Self.GodMode;
+            fallShakeBlock = Menu.Values.Self.GodMode;
+
             walkSpeed = BaseWalkSpeed * Menu.Values.Self.SpeedMultiplier;
             runSpeed = BaseRunSpeed * Menu.Values.Self.SpeedMultiplier;
             jumpHeight = BaseJumpHeight * Menu.Values.Self.JumpMultiplier;
