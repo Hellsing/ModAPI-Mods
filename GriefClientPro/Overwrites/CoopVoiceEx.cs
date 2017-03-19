@@ -69,21 +69,6 @@ namespace GriefClientPro.Overwrites
             }
         }
 
-        public override void ReceiveVoiceData(byte[] packet, int o)
-        {
-            try
-            {
-                var length = Blit.ReadI32(packet, ref o);
-                var numArray = new byte[length];
-                Blit.ReadBytes(packet, ref o, numArray, 0, length);
-                ReceiveVoiceData_Unpacked(numArray, length);
-            }
-            catch (Exception e)
-            {
-                Logger.Exception("Failed to receive voice data!", e);
-            }
-        }
-
         protected override void SendVoiceData(byte[] voice, int size, BoltConnection sendTo)
         {
             var entity = GetComponent<BoltEntity>();

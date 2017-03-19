@@ -57,25 +57,17 @@ namespace GriefClientPro.KeyActions
                         if (Enabled.RepairBuildings)
                         {
                             var entity = hit.collider.GetComponent<BoltEntity>();
-                            if (entity != null && entity.isAttached && entity.StateIs<IBuildingDestructibleState>() && entity.GetState<IBuildingDestructibleState>().repairTrigger)
+                            if (entity != null && entity.isAttached && entity.StateIs<IRepairableStructure>())
                             {
-                                Logger.Info("Found destructable structure!");
+                                Logger.Info("Found repairable structure!");
 
-                                var structure = entity.GetComponentInChildren<TheForest.Buildings.World.BuildingHealth>() ??
-                                                entity.GetComponentInChildren<TheForest.Buildings.World.FoundationHealth>() as IRepairableStructure;
-
+                                var structure = entity.GetState<IRepairableStructure>();
                                 if (structure != null)
                                 {
-                                    Logger.Info("Found repairable structure!");
+                                    Logger.Info("Got repairable structure!");
 
                                     var missingMaterials = structure.CalcTotalRepairMaterial() - structure.RepairMaterial;
-                                    var missingLogs = structure.CollapsedLogs - structure.RepairLogs;
-
-                                    if (missingMaterials == 0 && missingLogs == 0)
-                                    {
-                                        missingMaterials = 1;
-                                        missingLogs = 1;
-                                    }
+                                    var missingLogs = structure.CalcMissingRepairLogs() - structure.RepairLogs;
 
                                     if (missingMaterials > 0)
                                     {
@@ -97,7 +89,7 @@ namespace GriefClientPro.KeyActions
                         if (Enabled.KillEnemies)
                         {
                             var entity = hit.collider.GetComponent<BoltEntity>();
-                            if (entity != null && entity.isAttached && (entity.StateIs<IMutantState>() || entity.StateIs<IAnimalState>() || entity.StateIs<IAnimalDeerState>()))
+                            if (entity != null && entity.isAttached && entity.StateIs<IMutantState>())
                             {
                                 try
                                 {

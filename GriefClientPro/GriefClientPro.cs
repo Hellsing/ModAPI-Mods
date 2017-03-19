@@ -307,9 +307,8 @@ namespace GriefClientPro
                     if (triggerObject != null && triggerObject.activeSelf)
                     {
                         var trigger = triggerObject.GetComponent<RespawnDeadTrigger>();
-
-                        Logger.Info("trigger != null");
-                        Logger.Info("Reviving " + player.Entity.GetState<IPlayerState>().name);
+                        
+                        //Logger.Info("Reviving " + player.Entity.GetState<IPlayerState>().name);
 
                         // Send revive packet
                         var playerHealed = PlayerHealed.Create(GlobalTargets.Others);

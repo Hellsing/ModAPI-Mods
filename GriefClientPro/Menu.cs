@@ -260,9 +260,10 @@ namespace GriefClientPro
                                     {
                                         var offset = new Vector3(x * 8, y * 8, z * 8);
                                         var position = player.Position + offset;
+                                        var rotation = Quaternion.LookRotation(new Vector3(z * 8, y * 8, -(x * 8)) - Vector3.zero);
 
                                         // Spawn the traps
-                                        BoltPrefabsHelper.Spawn(BoltPrefabs.Trap_TripWireExplosiveBuilt, position, Quaternion.identity);
+                                        BoltPrefabsHelper.Spawn(BoltPrefabs.Trap_TripWireExplosiveBuilt, position, rotation);
                                     }
                                 }
                             }

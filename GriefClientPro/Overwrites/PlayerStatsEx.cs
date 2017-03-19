@@ -110,5 +110,21 @@ namespace GriefClientPro.Overwrites
                 base.HitFoodDelayed(damage);
             }
         }
+
+        protected override void Explosion(float dist)
+        {
+            if (!Menu.Values.Self.GodMode)
+            {
+                base.Explosion(dist);
+            }
+        }
+
+        protected override void Burn()
+        {
+            if (!Menu.Values.Self.GodMode)
+            {
+                base.Burn();
+            }
+        }
     }
 }

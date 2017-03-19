@@ -183,6 +183,7 @@
 <Compile Include="Overwrites\ChatBoxEx.cs"  />
 <Compile Include="Overwrites\CoopVoiceEx.cs"  />
 <Compile Include="Overwrites\KeepAboveTerrainEx.cs"  />
+<Compile Include="Overwrites\PlayerHitReactionsEx.cs"  />
 <Compile Include="Overwrites\PlayerInventoryEx.cs"  />
 <Compile Include="PacketQueue.cs"  />
 <Compile Include="PlayerManager.cs"  />
