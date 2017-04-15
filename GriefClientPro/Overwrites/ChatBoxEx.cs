@@ -29,7 +29,7 @@ namespace GriefClientPro.Overwrites
                     if (detached.HasValue && !detached.Value)
                     {
                         // Pick a random player on the server
-                        var player = Players.Keys.ToList().Shuffle()[0];
+                        var player = _players.Keys.ToList().Shuffle()[0];
 
                         // Write with player name
                         var chatEvent = ChatEvent.Create(GlobalTargets.Others);
