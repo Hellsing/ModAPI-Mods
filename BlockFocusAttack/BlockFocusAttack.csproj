@@ -141,6 +141,14 @@
       <HintPath>../../../modlib/TheForest/TheForest_data/Managed/System.Xml.dll</HintPath>
       <Private>False</Private>
     </Reference>
+<Reference Include="TheForest.Commons">
+      <HintPath>../../../modlib/TheForest/TheForest_data/Managed/TheForest.Commons.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+<Reference Include="TheForest.Modding">
+      <HintPath>../../../modlib/TheForest/TheForest_data/Managed/TheForest.Modding.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
 <Reference Include="UnityEngine">
       <HintPath>../../../modlib/TheForest/TheForest_data/Managed/UnityEngine.dll</HintPath>
       <Private>False</Private>
