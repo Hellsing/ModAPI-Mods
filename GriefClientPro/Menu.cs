@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using GriefClientPro.KeyActions;
 using GriefClientPro.Utils;
+using Steamworks;
 using TheForest.UI.Multiplayer;
 using TheForest.Utils;
 using UnityEngine;
@@ -201,7 +202,7 @@ namespace GriefClientPro
 
                 case 2:
                 {
-                    // Kill, Fire trail, teleport, exploit, trap
+                    // Kill, Fire trail, teleport, trap, steam
                     AddLabel("Player Name");
                     AddLabel("Kill", 160);
                     AddLabel("Fire trail", 220, increaseY: true);
@@ -240,16 +241,8 @@ namespace GriefClientPro
                             LocalPlayer.Transform.position = player.Position;
                         }
 
-                        // Add exploit button
-                        if (AddButton("Exploit", 385, 75))
-                        {
-                            var requestDestroy = RequestDestroy.Create(Bolt.GlobalTargets.Others);
-                            requestDestroy.Entity = player.Entity;
-                            PacketQueue.Add(requestDestroy);
-                        }
-
                         // Add trap extreme button
-                        if (AddButton("Trap", 470, 60))
+                        if (AddButton("Trap", 385, 60))
                         {
                             const int size = 5;
                             for (var x = -size; x < size; x++)
@@ -263,10 +256,17 @@ namespace GriefClientPro
                                         var rotation = Quaternion.LookRotation(new Vector3(z * 8, y * 8, -(x * 8)) - Vector3.zero);
 
                                         // Spawn the traps
-                                        BoltPrefabsHelper.Spawn(BoltPrefabs.Trap_TripWireExplosiveBuilt, position, rotation);
+                                        //BoltPrefabsHelper.Spawn(BoltPrefabs.Trap_TripWireExplosiveBuilt, position, rotation);
+                                        BoltPrefabsHelper.Spawn(BoltPrefabs.Dynamite_Placed, position, rotation);
                                     }
                                 }
                             }
+                        }
+
+                        // Add steam profile button
+                        if (AddButton("Steam", 455, 75))
+                        {
+                            SteamFriends.ActivateGameOverlayToUser("steamid", new CSteamID(player.SteamId));
                         }
 
                         Y += StepY;
