@@ -250,17 +250,24 @@ namespace GriefClientPro
                         GriefClientPro.ChatManager.ValidatePlayer();
 
                         AddLabel("Select a player", increaseY: true);
-                        foreach (var player in GriefClientPro.PlayerManager.Players)
+                        if (GriefClientPro.PlayerManager.Players.Count == 0)
                         {
-                            // Add checkbox
-                            if (GUI.Toggle(new Rect(MenuRect.xMin + Padding + 20, Y, 20, 20), GriefClientPro.ChatManager.LastChattedAs?.SteamId == player.SteamId, ""))
+                            AddLabel("- none found -", 20, increaseY: true);
+                        }
+                        else
+                        {
+                            foreach (var player in GriefClientPro.PlayerManager.Players)
                             {
-                                // Apply player
-                                GriefClientPro.ChatManager.LastChattedAs = player;
-                            }
+                                // Add checkbox
+                                if (GUI.Toggle(new Rect(MenuRect.xMin + Padding + 20, Y, 20, 20), GriefClientPro.ChatManager.LastChattedAs?.SteamId == player.SteamId, ""))
+                                {
+                                    // Apply player
+                                    GriefClientPro.ChatManager.LastChattedAs = player;
+                                }
 
-                            // Add player name
-                            AddLabel(player.Name, 40, increaseY: true);
+                                // Add player name
+                                AddLabel(player.Name, 40, increaseY: true);
+                            }
                         }
                     }
 
