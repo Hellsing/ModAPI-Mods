@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Bolt;
 using Steamworks;
 using TheForest.Networking;
 using TheForest.Utils;
@@ -83,6 +84,7 @@ namespace GriefClientPro
         public RespawnDeadTrigger DeadTrigger => DeadTriggerObject.GetComponent<RespawnDeadTrigger>();
         public Transform Transform => Entity.transform;
         public Vector3 Position => Transform.position;
+        public NetworkId NetworkId => Entity.networkId;
 
         public Player(BoltEntity player)
         {

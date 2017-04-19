@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-namespace GriefClientPro.Overwrites
+﻿namespace GriefClientPro.Overwrites
 {
     public class PlayerHitReactionsEx : playerHitReactions
     {

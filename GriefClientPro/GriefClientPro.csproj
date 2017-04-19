@@ -180,7 +180,8 @@
 
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="KeyActions\Aura.cs"  />
+    <Compile Include="ChatManager.cs"  />
+<Compile Include="KeyActions\Aura.cs"  />
 <Compile Include="KeyActions\DestroyTrees.cs"  />
 <Compile Include="KeyActions\DestroyBuildings.cs"  />
 <Compile Include="KeyActions\InstantBuild.cs"  />
@@ -188,7 +189,6 @@
 <Compile Include="KeyManager.cs"  />
 <Compile Include="KillAllPlayers.cs"  />
 <Compile Include="Menu.cs"  />
-<Compile Include="Overwrites\ChatBoxEx.cs"  />
 <Compile Include="Overwrites\CoopVoiceEx.cs"  />
 <Compile Include="Overwrites\KeepAboveTerrainEx.cs"  />
 <Compile Include="Overwrites\PlayerHitReactionsEx.cs"  />

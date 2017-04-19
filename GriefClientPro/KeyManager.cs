@@ -13,7 +13,6 @@ namespace GriefClientPro
             SphereAction,
             OpenMenu,
             InstantBuild,
-            FreezeTime,
             FreeCam,
             DestroyEverything,
             DestroyTrees,

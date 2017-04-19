@@ -193,6 +193,77 @@ namespace GriefClientPro
 
                 case 1:
                 {
+                    AddLabel("Chat as...", increaseY: true);
+
+                    // Chat as self
+                    if (AddCheckBox(ref GriefClientPro.ChatManager.ChatAsSelf, 20))
+                    {
+                        GriefClientPro.ChatManager.ChatAsRandom = false;
+                        GriefClientPro.ChatManager.ChatAsSelected = false;
+                    }
+                    AddLabel("Self", 40);
+
+                    // Chat as random
+                    if (AddCheckBox(ref GriefClientPro.ChatManager.ChatAsRandom, 80))
+                    {
+                        GriefClientPro.ChatManager.ChatAsSelf = false;
+                        GriefClientPro.ChatManager.ChatAsSelected = false;
+                    }
+                    AddLabel("Random", 100);
+
+                    // Chat as selected
+                    if (AddCheckBox(ref GriefClientPro.ChatManager.ChatAsSelected, 165))
+                    {
+                        GriefClientPro.ChatManager.ChatAsRandom = false;
+                        GriefClientPro.ChatManager.ChatAsSelf = false;
+                    }
+                    AddLabel("Selected", 185, increaseY: true);
+
+                    if (GriefClientPro.ChatManager.ChatAsSelf)
+                    {
+                        AddLabel("Chat as while invisible...", increaseY: true);
+
+                        // Chat as random
+                        if (AddCheckBox(ref GriefClientPro.ChatManager.ChatInvisibleAsRandom, 20))
+                        {
+                            GriefClientPro.ChatManager.ChatInvisibleAsSelected = false;
+                        }
+                        AddLabel("Random", 40);
+
+                        // Chat as selected
+                        if (AddCheckBox(ref GriefClientPro.ChatManager.ChatInvisibleAsSelected, 105))
+                        {
+                            GriefClientPro.ChatManager.ChatInvisibleAsRandom = false;
+                        }
+                        AddLabel("Selected", 125, increaseY: true);
+                    }
+
+                    AddLabel("Prefix options", increaseY: true);
+                    AddCheckBox(ref GriefClientPro.ChatManager.UsePrefix, 20);
+                    AddLabel("Enabled", 40);
+                    GriefClientPro.ChatManager.Prefix = GUI.TextField(new Rect(MenuRect.xMin + Padding + 105, Y, 50, 20), GriefClientPro.ChatManager.Prefix);
+                    IncreaseY();
+
+                    if (GriefClientPro.ChatManager.ChatAsSelected || GriefClientPro.ChatManager.ChatInvisibleAsSelected)
+                    {
+                        // Validate current player
+                        GriefClientPro.ChatManager.ValidatePlayer();
+
+                        AddLabel("Select a player", increaseY: true);
+                        foreach (var player in GriefClientPro.PlayerManager.Players)
+                        {
+                            // Add checkbox
+                            if (GUI.Toggle(new Rect(MenuRect.xMin + Padding + 20, Y, 20, 20), GriefClientPro.ChatManager.LastChattedAs?.SteamId == player.SteamId, ""))
+                            {
+                                // Apply player
+                                GriefClientPro.ChatManager.LastChattedAs = player;
+                            }
+
+                            // Add player name
+                            AddLabel(player.Name, 40, increaseY: true);
+                        }
+                    }
+
                     break;
                 }
 

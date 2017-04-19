@@ -16,7 +16,7 @@ namespace GriefClientPro
 {
     public class GriefClientPro : MonoBehaviour
     {
-        public const string ModName = "GriefClientPro";
+        public const string ModName = nameof(GriefClientPro);
         public static readonly string DataFolderLocation = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), ModName);
         public static string PlayerName { get; private set; }
 
@@ -28,27 +28,6 @@ namespace GriefClientPro
         private static Vector3 LastFirePos { get; set; }
         private static int LastFireTime { get; set; }
 
-        private static bool _freezeTime;
-        public static bool FreezeTime
-        {
-            get { return _freezeTime; }
-            set
-            {
-                _freezeTime = value;
-                _frozenTimeValue = TheForestAtmosphere.Instance.TimeOfDay;
-            }
-        }
-        private static float _frozenTimeValue;
-        public static float TimeOfDay
-        {
-            get { return FreezeTime ? _frozenTimeValue : TheForestAtmosphere.Instance.TimeOfDay; }
-            set
-            {
-                _frozenTimeValue = value;
-                TheForestAtmosphere.Instance.TimeOfDay = value;
-            }
-        }
-
         public static KeyManager KeyManager { get; private set; }
         public static PlayerManager PlayerManager { get; private set; }
         public static SphereAction SphereAction { get; private set; }
@@ -56,13 +35,14 @@ namespace GriefClientPro
         public static KillAllPlayers KillAllPlayers { get; private set; }
         public static DestroyBuildings DestroyBuildings { get; private set; }
         public static DestroyTrees DestroyTrees { get; private set; }
-        public static Aura Aura { get; set; }
+        public static Aura Aura { get; private set; }
+        public static ChatManager ChatManager { get; private set; }
 
         [ExecuteOnGameStart]
         // ReSharper disable once UnusedMember.Local
         private static void Init()
         {
-            Logger.Info("Initializing GriefClientPro...");
+            Logger.Info($"Initializing {nameof(GriefClientPro)}...");
             Logger.Info("Dummy object: " + (DummyObject == null ? "null (good)" : "already set (bad)"));
 
             try
@@ -88,22 +68,24 @@ namespace GriefClientPro
             try
             {
                 // Initialize properties
-                Logger.Info("Setting up KeyManager");
+                Logger.Info($"Setting up {nameof(KeyManager)}");
                 KeyManager = new KeyManager(this);
-                Logger.Info("Setting up PlayerManager");
+                Logger.Info($"Setting up {nameof(PlayerManager)}");
                 PlayerManager = new PlayerManager(this);
-                Logger.Info("Setting up SphereAction");
+                Logger.Info($"Setting up {nameof(SphereAction)}");
                 SphereAction = new SphereAction();
-                Logger.Info("Setting up InstantBuilding");
+                Logger.Info($"Setting up {nameof(InstantBuilding)}");
                 InstantBuilding = new InstantBuild(this);
-                Logger.Info("Setting up KillAllPlayers");
+                Logger.Info($"Setting up {nameof(KillAllPlayers)}");
                 KillAllPlayers = new KillAllPlayers(this);
-                Logger.Info("Setting up DestroyBuildings");
+                Logger.Info($"Setting up {nameof(DestroyBuildings)}");
                 DestroyBuildings = new DestroyBuildings(this);
-                Logger.Info("Setting up DestroyTrees");
+                Logger.Info($"Setting up {nameof(DestroyTrees)}");
                 DestroyTrees = new DestroyTrees(this);
-                Logger.Info("Setting up Aura");
+                Logger.Info($"Setting up {nameof(Aura)}");
                 Aura = new Aura(this);
+                Logger.Info($"Setting up {nameof(ChatManager)}");
+                ChatManager = new ChatManager(this);
                 Logger.Info("Initialization completed!");
             }
             catch (Exception e)
@@ -148,13 +130,13 @@ namespace GriefClientPro
                         }
                         catch (Exception e)
                         {
-                            Logger.Exception("Exception while notifying OnTick listener: " + action.GetType().Name, e);
+                            Logger.Exception($"Exception while notifying {nameof(OnTick)} listener: " + action.GetType().Name, e);
                         }
                     }
                 }
                 catch (Exception e)
                 {
-                    Logger.Exception("Exception while looping over OnTick listeners", e);
+                    Logger.Exception($"Exception while looping over {nameof(OnTick)} listeners", e);
                 }
             }
 
@@ -182,17 +164,6 @@ namespace GriefClientPro
                         BoltPrefabsHelper.Spawn(BoltPrefabs.Fire, feetPos, LocalPlayer.Transform.rotation);
                     }
                 }
-            }
-
-            if (FreezeTime && !LastFreezeTime)
-            {
-                Time.timeScale = 0f;
-                LastFreezeTime = true;
-            }
-            if (!FreezeTime && LastFreezeTime)
-            {
-                Time.timeScale = 1f;
-                LastFreezeTime = false;
             }
 
             if (Menu.Values.Other.FreeCam && !LastFreeCam)
@@ -242,11 +213,6 @@ namespace GriefClientPro
                 RotationY += Input.GetAxis("Mouse Y") * 15f;
                 RotationY = Mathf.Clamp(RotationY, -80f, 80f);
                 Camera.main.transform.localEulerAngles = new Vector3(-RotationY, rotationX, 0);
-            }
-
-            if (ModAPI.Input.GetButtonDown("FreezeTime"))
-            {
-                FreezeTime = !FreezeTime;
             }
 
             if (ModAPI.Input.GetButtonDown("FreeCam"))
@@ -307,7 +273,7 @@ namespace GriefClientPro
                     if (triggerObject != null && triggerObject.activeSelf)
                     {
                         var trigger = triggerObject.GetComponent<RespawnDeadTrigger>();
-                        
+
                         //Logger.Info("Reviving " + player.Entity.GetState<IPlayerState>().name);
 
                         // Send revive packet
