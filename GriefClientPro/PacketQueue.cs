@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Timers;
 using Bolt;
+using GriefClientPro.Utils;
 
 namespace GriefClientPro
 {
@@ -31,9 +32,9 @@ namespace GriefClientPro
                         {
                             packet.Send();
                         }
-                        catch (Exception)
+                        catch (Exception e)
                         {
-                            // ignored
+                            Logger.Exception("Error while trying to send packet!", e);
                         }
                     }
                 }

@@ -86,6 +86,11 @@ namespace GriefClientPro
                                 Logger.Warning("Player still null even after refresh (all invisible?)");
                                 return;
                             }
+                            if (!GriefClientPro.ChatManager.LastChattedAs.Entity.isAttached)
+                            {
+                                Logger.Warning("Random player is not attached (disconnecting?)");
+                                return;
+                            }
                         }
 
                         // Get the player to chat as
@@ -93,21 +98,18 @@ namespace GriefClientPro
                         var senderNetworkId = GriefClientPro.ChatManager.ChatAsSelf && attached.HasValue && attached.Value ? LocalPlayer.Entity.networkId : player.NetworkId;
 
                         // Create the chat event
-                        var chatEvent = ChatEvent.Create(GlobalTargets.Others);
+                        var chatEvent = ChatEvent.Create(GlobalTargets.OnlyServer);
                         chatEvent.Message = (GriefClientPro.ChatManager.UsePrefix ? GriefClientPro.ChatManager.Prefix : "") + _input.value;
 
                         // Define the sender
                         chatEvent.Sender = senderNetworkId;
 
                         // Send the message
-                        chatEvent.Send();
-
-                        // Display locally
-                        AddLine(senderNetworkId, chatEvent.Message, false);
+                        PacketQueue.Add(chatEvent);
                     }
                     catch (Exception e)
                     {
-                        Logger.Exception("Exception while trying to send message!", e);
+                        Logger.Exception("Exception while processing chat message to send!", e);
                     }
 
                     _input.value = null;
