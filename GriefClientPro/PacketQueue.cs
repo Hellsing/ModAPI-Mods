@@ -26,6 +26,8 @@ namespace GriefClientPro
                     var packets = CurrentQueue.GetRange(0, Math.Min(100, CurrentQueue.Count));
                     CurrentQueue.RemoveRange(0, Math.Min(100, CurrentQueue.Count));
 
+                    Logger.Info("Sending {0} packet(s)...", packets.Count);
+
                     foreach (var packet in packets)
                     {
                         try

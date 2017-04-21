@@ -13,16 +13,44 @@ namespace GriefClientPro
         // Special default prefix for Hellsing: http://steamcommunity.com/id/singhell/
         public static string DefaultPrefix => SteamUser.GetSteamID().m_SteamID == 76561198008774571 ? "Ⓗ " : "<ツ> ";
 
+        public enum ChatAs
+        {
+            Self,
+            Random,
+            Selected
+        }
+
+        public enum ChatAsInvisible
+        {
+            Random,
+            Selected
+        }
+
+        public static readonly string[] ChatAsNames = Enum.GetNames(typeof(ChatAs));
+        public static readonly string[] ChatAsInvisibleNames = Enum.GetNames(typeof(ChatAsInvisible));
+
+        public static readonly int ChatAsCount = ChatAsNames.Length;
+        public static readonly int ChatAsInvisibleCount = ChatAsInvisibleNames.Length;
+
+        public class ChatEventArgs : EventArgs
+        {
+            public bool CustomHandler { get; set; }
+            public string Text { get; set; }
+            public NetworkId SenderId { get; set; }
+            public GlobalTargets Target { get; set; } = GlobalTargets.OnlyServer;
+        }
+
         private GriefClientPro Instance { get; set; }
 
-        public bool UsePrefix = true;
+        public bool UsePrefixWhenVisible;
+        public bool UsePrefixWhenInvisible = true;
         public string Prefix = DefaultPrefix;
 
-        public bool ChatAsSelf = true;
-        public bool ChatAsRandom;
-        public bool ChatAsSelected;
-        public bool ChatInvisibleAsRandom = true;
-        public bool ChatInvisibleAsSelected;
+        public int ChatAsValue = (int) ChatAs.Self;
+        public int ChatAsInvisibleValue = (int) ChatAsInvisible.Random;
+
+        public ChatAs CurrentChatAs => (ChatAs) ChatAsValue;
+        public ChatAsInvisible CurrentChatAsInvisible => (ChatAsInvisible) ChatAsInvisibleValue;
 
         public Player LastChattedAs { get; set; }
 
@@ -47,6 +75,57 @@ namespace GriefClientPro
                 LastChattedAs = GriefClientPro.PlayerManager.Players.Shuffle()[0];
             }
         }
+
+        public void OnSubmit(ChatEventArgs chatEvent)
+        {
+            if (!string.IsNullOrEmpty(chatEvent.Text))
+            {
+                try
+                {
+                    if (!BoltNetwork.isRunning)
+                    {
+                        return;
+                    }
+
+                    // Check if player is detached
+                    var isAttached = LocalPlayer.Entity?.isAttached ?? false;
+
+                    // Validate player
+                    ValidatePlayer();
+
+                    // Check if we need to randomize
+                    if (CurrentChatAs == ChatAs.Random || (CurrentChatAs == ChatAs.Self && !isAttached && CurrentChatAsInvisible == ChatAsInvisible.Random))
+                    {
+                        RandomizePlayer();
+
+                        // Validate
+                        if (LastChattedAs == null)
+                        {
+                            Logger.Warning("Player still null even after refresh (all invisible?)");
+                            return;
+                        }
+                        if (!LastChattedAs.Entity.isAttached)
+                        {
+                            Logger.Warning("Random player is not attached (disconnecting?)");
+                            return;
+                        }
+                    }
+
+                    // Apply values
+                    if (!isAttached)
+                    {
+                        chatEvent.Target = GlobalTargets.Everyone;
+                    }
+                    chatEvent.CustomHandler = true;
+                    chatEvent.SenderId = CurrentChatAs == ChatAs.Self && isAttached ? LocalPlayer.Entity.networkId : LastChattedAs.NetworkId;
+                    chatEvent.Text = ((isAttached && UsePrefixWhenVisible) || (!isAttached && UsePrefixWhenInvisible) ? GriefClientPro.ChatManager.Prefix : string.Empty) + chatEvent.Text;
+                }
+                catch (Exception e)
+                {
+                    Logger.Exception("Exception while processing chat message to send!", e);
+                }
+            }
+        }
     }
 
     public class ChatBoxEx : ChatBox
@@ -56,64 +135,33 @@ namespace GriefClientPro
             if (GriefClientPro.ChatManager == null)
             {
                 base.OnSubmit();
+                return;
+            }
+
+            // Create local event
+            var chatEvent = new ChatManager.ChatEventArgs
+            {
+                Text = _input.value
+            };
+
+            // Process the event
+            GriefClientPro.ChatManager.OnSubmit(chatEvent);
+
+            if (!chatEvent.CustomHandler || string.IsNullOrEmpty(chatEvent.Text))
+            {
+                base.OnSubmit();
             }
             else
             {
-                if (!string.IsNullOrEmpty(_input.value))
-                {
-                    try
-                    {
-                        if (!BoltNetwork.isRunning)
-                        {
-                            return;
-                        }
+                // Create the chat event
+                var @event = ChatEvent.Create(chatEvent.Target);
+                @event.Message = chatEvent.Text;
+                @event.Sender = chatEvent.SenderId;
 
-                        // Check if player is detached
-                        var attached = LocalPlayer.GameObject?.GetComponent<BoltEntity>()?.isAttached;
+                // Send the message
+                PacketQueue.Add(@event);
 
-                        // Validate player
-                        GriefClientPro.ChatManager.ValidatePlayer();
-
-                        // Check if we need to randomize
-                        if (GriefClientPro.ChatManager.ChatAsRandom ||
-                            (GriefClientPro.ChatManager.ChatAsSelf && attached.HasValue && !attached.Value && GriefClientPro.ChatManager.ChatInvisibleAsRandom))
-                        {
-                            GriefClientPro.ChatManager.RandomizePlayer();
-
-                            // Validate
-                            if (GriefClientPro.ChatManager.LastChattedAs == null)
-                            {
-                                Logger.Warning("Player still null even after refresh (all invisible?)");
-                                return;
-                            }
-                            if (!GriefClientPro.ChatManager.LastChattedAs.Entity.isAttached)
-                            {
-                                Logger.Warning("Random player is not attached (disconnecting?)");
-                                return;
-                            }
-                        }
-
-                        // Get the player to chat as
-                        var player = GriefClientPro.ChatManager.LastChattedAs;
-                        var senderNetworkId = GriefClientPro.ChatManager.ChatAsSelf && attached.HasValue && attached.Value ? LocalPlayer.Entity.networkId : player.NetworkId;
-
-                        // Create the chat event
-                        var chatEvent = ChatEvent.Create(GlobalTargets.OnlyServer);
-                        chatEvent.Message = (GriefClientPro.ChatManager.UsePrefix ? GriefClientPro.ChatManager.Prefix : "") + _input.value;
-
-                        // Define the sender
-                        chatEvent.Sender = senderNetworkId;
-
-                        // Send the message
-                        PacketQueue.Add(chatEvent);
-                    }
-                    catch (Exception e)
-                    {
-                        Logger.Exception("Exception while processing chat message to send!", e);
-                    }
-
-                    _input.value = null;
-                }
+                _input.value = null;
                 _mustClose = true;
                 _lastInteractionTime = Time.time;
             }

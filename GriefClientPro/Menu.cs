@@ -110,13 +110,13 @@ namespace GriefClientPro
             CurrentTab = GUI.Toolbar(new Rect(MenuRect.xMin, MenuRect.yMin, MenuRect.width, ToolbarHeight), CurrentTab,
                 new[]
                 {
-                    new GUIContent(nameof(Values.Self)),
-                    new GUIContent(nameof(Values.Chat)),
-                    new GUIContent("Players"),
-                    new GUIContent(nameof(Values.Other)),
-                    new GUIContent("Sphere"),
-                    new GUIContent("PermaKill"),
-                    new GUIContent("Aura")
+                    nameof(Values.Self),
+                    nameof(Values.Chat),
+                    "Players",
+                    nameof(Values.Other),
+                    "Sphere",
+                    "PermaKill",
+                    "Aura"
                 },
                 GUI.skin.GetStyle("Tabs"));
 
@@ -194,57 +194,26 @@ namespace GriefClientPro
                 case 1:
                 {
                     AddLabel("Chat as...", increaseY: true);
+                    AddRadioButtons(ref GriefClientPro.ChatManager.ChatAsValue, ChatManager.ChatAsNames, ChatManager.ChatAsCount, width: ChatManager.ChatAsCount * 100, increaseY: true);
 
-                    // Chat as self
-                    if (AddCheckBox(ref GriefClientPro.ChatManager.ChatAsSelf, 20))
-                    {
-                        GriefClientPro.ChatManager.ChatAsRandom = false;
-                        GriefClientPro.ChatManager.ChatAsSelected = false;
-                    }
-                    AddLabel("Self", 40);
-
-                    // Chat as random
-                    if (AddCheckBox(ref GriefClientPro.ChatManager.ChatAsRandom, 80))
-                    {
-                        GriefClientPro.ChatManager.ChatAsSelf = false;
-                        GriefClientPro.ChatManager.ChatAsSelected = false;
-                    }
-                    AddLabel("Random", 100);
-
-                    // Chat as selected
-                    if (AddCheckBox(ref GriefClientPro.ChatManager.ChatAsSelected, 165))
-                    {
-                        GriefClientPro.ChatManager.ChatAsRandom = false;
-                        GriefClientPro.ChatManager.ChatAsSelf = false;
-                    }
-                    AddLabel("Selected", 185, increaseY: true);
-
-                    if (GriefClientPro.ChatManager.ChatAsSelf)
+                    if (GriefClientPro.ChatManager.CurrentChatAs == ChatManager.ChatAs.Self)
                     {
                         AddLabel("Chat as while invisible...", increaseY: true);
-
-                        // Chat as random
-                        if (AddCheckBox(ref GriefClientPro.ChatManager.ChatInvisibleAsRandom, 20))
-                        {
-                            GriefClientPro.ChatManager.ChatInvisibleAsSelected = false;
-                        }
-                        AddLabel("Random", 40);
-
-                        // Chat as selected
-                        if (AddCheckBox(ref GriefClientPro.ChatManager.ChatInvisibleAsSelected, 105))
-                        {
-                            GriefClientPro.ChatManager.ChatInvisibleAsRandom = false;
-                        }
-                        AddLabel("Selected", 125, increaseY: true);
+                        AddRadioButtons(ref GriefClientPro.ChatManager.ChatAsInvisibleValue, ChatManager.ChatAsInvisibleNames, ChatManager.ChatAsInvisibleCount,
+                            width: ChatManager.ChatAsInvisibleCount * 100, increaseY: true);
                     }
 
                     AddLabel("Prefix options", increaseY: true);
-                    AddCheckBox(ref GriefClientPro.ChatManager.UsePrefix, 20);
-                    AddLabel("Enabled", 40);
-                    GriefClientPro.ChatManager.Prefix = GUI.TextField(new Rect(MenuRect.xMin + Padding + 105, Y, 50, 20), GriefClientPro.ChatManager.Prefix);
+                    AddCheckBox(ref GriefClientPro.ChatManager.UsePrefixWhenVisible, 20);
+                    AddLabel("Visible", 40);
+                    AddCheckBox(ref GriefClientPro.ChatManager.UsePrefixWhenInvisible, 100);
+                    AddLabel("Invisible", 120);
+                    AddLabel("Prefix: ", 190);
+                    GriefClientPro.ChatManager.Prefix = GUI.TextField(new Rect(MenuRect.xMin + Padding + 235, Y, 50, 20), GriefClientPro.ChatManager.Prefix);
                     IncreaseY();
 
-                    if (GriefClientPro.ChatManager.ChatAsSelected || GriefClientPro.ChatManager.ChatInvisibleAsSelected)
+                    if (GriefClientPro.ChatManager.CurrentChatAs == ChatManager.ChatAs.Selected ||
+                        GriefClientPro.ChatManager.CurrentChatAsInvisible == ChatManager.ChatAsInvisible.Selected)
                     {
                         // Validate current player
                         GriefClientPro.ChatManager.ValidatePlayer();
@@ -285,69 +254,76 @@ namespace GriefClientPro
                     AddLabel("Kill", 160);
                     AddLabel("Fire trail", 220, increaseY: true);
 
-                    foreach (var player in GriefClientPro.PlayerManager.Players)
+                    if (GriefClientPro.PlayerManager.Players.Count == 0)
                     {
-                        // Add player name
-                        AddLabel(player.Name);
+                        AddLabel("- none found -", 20, increaseY: true);
+                    }
+                    else
+                    {
+                        foreach (var player in GriefClientPro.PlayerManager.Players)
+                        {
+                            // Add player name
+                            AddLabel(player.Name);
 
-                        // Add kill checkbox
-                        if (GUI.Toggle(new Rect(MenuRect.xMin + Padding + 160, Y, 20, 20), GriefClientPro.KillAllPlayers.PermaKillPlayers.Contains(player.SteamId), ""))
-                        {
-                            GriefClientPro.KillAllPlayers.AddPlayerToPermaKill(player);
-                        }
-                        else
-                        {
-                            GriefClientPro.KillAllPlayers.RemovePlayerToPermaKill(player);
-                        }
-
-                        // Add fire trail checkbox
-                        if (GUI.Toggle(new Rect(MenuRect.xMin + Padding + 220, Y, 20, 20), LastFirePositions.ContainsKey(player.SteamId), ""))
-                        {
-                            if (!LastFirePositions.ContainsKey(player.SteamId))
+                            // Add kill checkbox
+                            if (GUI.Toggle(new Rect(MenuRect.xMin + Padding + 160, Y, 20, 20), GriefClientPro.KillAllPlayers.PermaKillPlayers.Contains(player.SteamId), ""))
                             {
-                                LastFirePositions.Add(player.SteamId, Vector3.zero);
+                                GriefClientPro.KillAllPlayers.AddPlayerToPermaKill(player);
                             }
-                        }
-                        else
-                        {
-                            LastFirePositions.Remove(player.SteamId);
-                        }
-
-                        // Add teleport button
-                        if (AddButton("Teleport", 300, 75))
-                        {
-                            LocalPlayer.Transform.position = player.Position;
-                        }
-
-                        // Add trap extreme button
-                        if (AddButton("Trap", 385, 60))
-                        {
-                            const int size = 5;
-                            for (var x = -size; x < size; x++)
+                            else
                             {
-                                for (var y = -1; y < size / 2; y++)
-                                {
-                                    for (var z = -size; z < size; z++)
-                                    {
-                                        var offset = new Vector3(x * 8, y * 8, z * 8);
-                                        var position = player.Position + offset;
-                                        var rotation = Quaternion.LookRotation(new Vector3(z * 8, y * 8, -(x * 8)) - Vector3.zero);
+                                GriefClientPro.KillAllPlayers.RemovePlayerToPermaKill(player);
+                            }
 
-                                        // Spawn the traps
-                                        //BoltPrefabsHelper.Spawn(BoltPrefabs.Trap_TripWireExplosiveBuilt, position, rotation);
-                                        BoltPrefabsHelper.Spawn(BoltPrefabs.Dynamite_Placed, position, rotation);
+                            // Add fire trail checkbox
+                            if (GUI.Toggle(new Rect(MenuRect.xMin + Padding + 220, Y, 20, 20), LastFirePositions.ContainsKey(player.SteamId), ""))
+                            {
+                                if (!LastFirePositions.ContainsKey(player.SteamId))
+                                {
+                                    LastFirePositions.Add(player.SteamId, Vector3.zero);
+                                }
+                            }
+                            else
+                            {
+                                LastFirePositions.Remove(player.SteamId);
+                            }
+
+                            // Add teleport button
+                            if (AddButton("Teleport", 300, 75))
+                            {
+                                LocalPlayer.Transform.position = player.Position;
+                            }
+
+                            // Add trap extreme button
+                            if (AddButton("Trap", 385, 60))
+                            {
+                                const int size = 5;
+                                for (var x = -size; x < size; x++)
+                                {
+                                    for (var y = -1; y < size / 2; y++)
+                                    {
+                                        for (var z = -size; z < size; z++)
+                                        {
+                                            var offset = new Vector3(x * 8, y * 8, z * 8);
+                                            var position = player.Position + offset;
+                                            var rotation = Quaternion.LookRotation(new Vector3(z * 8, y * 8, -(x * 8)) - Vector3.zero);
+
+                                            // Spawn the traps
+                                            //BoltPrefabsHelper.Spawn(BoltPrefabs.Trap_TripWireExplosiveBuilt, position, rotation);
+                                            BoltPrefabsHelper.Spawn(BoltPrefabs.instantDynamite, position, rotation);
+                                        }
                                     }
                                 }
                             }
-                        }
 
-                        // Add steam profile button
-                        if (AddButton("Steam", 455, 75))
-                        {
-                            SteamFriends.ActivateGameOverlayToUser("steamid", new CSteamID(player.SteamId));
-                        }
+                            // Add steam profile button
+                            if (AddButton("Steam", 455, 75))
+                            {
+                                SteamFriends.ActivateGameOverlayToUser("steamid", new CSteamID(player.SteamId));
+                            }
 
-                        Y += StepY;
+                            Y += StepY;
+                        }
                     }
 
                     break;
@@ -466,6 +442,12 @@ namespace GriefClientPro
             }
         }
 
+        private static void AddRadioButtons(ref int updateValue, string[] texts, int xCount, float x = Padding, float width = 250, float height = 20, bool increaseY = false, bool autoAlign = true)
+        {
+            updateValue = GUI.SelectionGrid(new Rect((autoAlign ? MenuRect.xMin : 0) + Padding + x, Y, width, height), updateValue, texts, xCount, GUI.skin.GetStyle("Button"));
+            IncreaseY(increaseY);
+        }
+
         private static void AddLabel(string text, float x = Padding, float width = 150, float height = 20, bool increaseY = false, bool autoAlign = true)
         {
             GUI.Label(new Rect((autoAlign ? MenuRect.xMin : 0) + Padding + x, Y, width, height), text, LabelStyle);
@@ -474,7 +456,12 @@ namespace GriefClientPro
 
         private static bool AddCheckBox(ref bool updateValue, float x = 160, float width = 20, float height = 30, bool increaseY = false, bool autoAlign = true)
         {
-            updateValue = GUI.Toggle(new Rect((autoAlign ? MenuRect.xMin : 0) + Padding + x, Y, width, height), updateValue, "");
+            return AddCheckBox(ref updateValue, string.Empty, x, width, height, increaseY, autoAlign);
+        }
+
+        private static bool AddCheckBox(ref bool updateValue, string text, float x = 160, float width = 20, float height = 30, bool increaseY = false, bool autoAlign = true)
+        {
+            updateValue = GUI.Toggle(new Rect((autoAlign ? MenuRect.xMin : 0) + Padding + x, Y, width, height), updateValue, text);
             IncreaseY(increaseY);
             return updateValue;
         }
