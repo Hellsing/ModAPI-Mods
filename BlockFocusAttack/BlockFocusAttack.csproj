@@ -45,10 +45,6 @@
       <HintPath>../../../modlib/TheForest/TheForest_data/Managed/Assembly-UnityScript.dll</HintPath>
       <Private>False</Private>
     </Reference>
-<Reference Include="SteamworksManaged">
-      <HintPath>../../../modlib/TheForest/TheForest_data/Managed/SteamworksManaged.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
 <Reference Include="Boo.Lang">
       <HintPath>../../../modlib/TheForest/TheForest_data/Managed/Boo.Lang.dll</HintPath>
       <Private>False</Private>
@@ -59,6 +55,10 @@
     </Reference>
 <Reference Include="UnityScript.Lang">
       <HintPath>../../../modlib/TheForest/TheForest_data/Managed/UnityScript.Lang.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+<Reference Include="AmplifyColor">
+      <HintPath>../../../modlib/TheForest/TheForest_data/Managed/AmplifyColor.dll</HintPath>
       <Private>False</Private>
     </Reference>
 <Reference Include="AmplifyMotion">
@@ -113,10 +113,6 @@
       <HintPath>../../../modlib/TheForest/TheForest_data/Managed/Rewired_Core.dll</HintPath>
       <Private>False</Private>
     </Reference>
-<Reference Include="Rewired_Windows_Lib">
-      <HintPath>../../../modlib/TheForest/TheForest_data/Managed/Rewired_Windows_Lib.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
 <Reference Include="SteamworksManaged">
       <HintPath>../../../modlib/TheForest/TheForest_data/Managed/SteamworksManaged.dll</HintPath>
       <Private>False</Private>
@@ -139,14 +135,6 @@
     </Reference>
 <Reference Include="System.Xml">
       <HintPath>../../../modlib/TheForest/TheForest_data/Managed/System.Xml.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-<Reference Include="TheForest.Commons">
-      <HintPath>../../../modlib/TheForest/TheForest_data/Managed/TheForest.Commons.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-<Reference Include="TheForest.Modding">
-      <HintPath>../../../modlib/TheForest/TheForest_data/Managed/TheForest.Modding.dll</HintPath>
       <Private>False</Private>
     </Reference>
 <Reference Include="UnityEngine">
