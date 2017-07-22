@@ -105,10 +105,10 @@ namespace GriefClientPro.Overwrites
                     }
 
                     var vector3 = Camera.main.transform.rotation * (
-                        new Vector3(Input.GetAxis("Horizontal"),
-                            0f,
-                            Input.GetAxis("Vertical")
-                            ) * multiplier * Menu.Values.Self.SpeedMultiplier);
+                                      new Vector3(Input.GetAxis("Horizontal"),
+                                          0f,
+                                          Input.GetAxis("Vertical")
+                                      ) * multiplier * Menu.Values.Self.SpeedMultiplier);
                     var velocity = rb.velocity;
                     if (button3)
                     {

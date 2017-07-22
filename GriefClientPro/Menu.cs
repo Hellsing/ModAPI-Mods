@@ -111,11 +111,11 @@ namespace GriefClientPro
                 new[]
                 {
                     nameof(Values.Self),
-                    nameof(Values.Chat),
+                    "Chat",
+                    "Voice",
                     "Players",
                     nameof(Values.Other),
                     "Sphere",
-                    "PermaKill",
                     "Aura"
                 },
                 GUI.skin.GetStyle("Tabs"));
@@ -125,7 +125,7 @@ namespace GriefClientPro
             // ReSharper disable once SwitchStatementMissingSomeCases
             switch (CurrentTab)
             {
-                    #region Self
+                #region Self
 
                 case 0:
                 {
@@ -187,9 +187,9 @@ namespace GriefClientPro
                     break;
                 }
 
-                    #endregion
+                #endregion
 
-                    #region Chat
+                #region Chat
 
                 case 1:
                 {
@@ -243,11 +243,58 @@ namespace GriefClientPro
                     break;
                 }
 
-                    #endregion
+                #endregion
 
-                    #region Players
+                #region Voice
 
                 case 2:
+                {
+                    AddLabel("Sendng voice as...", increaseY: true);
+                    AddRadioButtons(ref GriefClientPro.VoiceManager.ChatAsValue, VoiceManager.ChatAsNames, VoiceManager.ChatAsCount, width: VoiceManager.ChatAsCount * 100, increaseY: true);
+
+                    if (GriefClientPro.VoiceManager.CurrentChatAs == VoiceManager.VoiceChatAs.Self)
+                    {
+                        AddLabel("Chat as while invisible...", increaseY: true);
+                        AddRadioButtons(ref GriefClientPro.VoiceManager.ChatAsInvisibleValue, VoiceManager.ChatAsInvisibleNames, VoiceManager.ChatAsInvisibleCount,
+                            width: VoiceManager.ChatAsInvisibleCount * 100, increaseY: true);
+                    }
+
+                    if (GriefClientPro.VoiceManager.CurrentChatAs == VoiceManager.VoiceChatAs.Selected ||
+                        GriefClientPro.VoiceManager.CurrentChatAsInvisible == VoiceManager.VoiceChatAsInvisible.Selected)
+                    {
+                        // Validate current player
+                        GriefClientPro.VoiceManager.ValidatePlayer();
+
+                        AddLabel("Select a player", increaseY: true);
+                        if (GriefClientPro.PlayerManager.Players.Count == 0)
+                        {
+                            AddLabel("- none found -", 20, increaseY: true);
+                        }
+                        else
+                        {
+                            foreach (var player in GriefClientPro.PlayerManager.Players)
+                            {
+                                // Add checkbox
+                                if (GUI.Toggle(new Rect(MenuRect.xMin + Padding + 20, Y, 20, 20), GriefClientPro.VoiceManager.LastChattedAs?.SteamId == player.SteamId, ""))
+                                {
+                                    // Apply player
+                                    GriefClientPro.VoiceManager.LastChattedAs = player;
+                                }
+
+                                // Add player name
+                                AddLabel(player.Name, 40, increaseY: true);
+                            }
+                        }
+                    }
+
+                    break;
+                }
+
+                #endregion
+
+                #region Players
+
+                case 3:
                 {
                     // Kill, Fire trail, teleport, trap, steam
                     AddLabel("Player Name");
@@ -265,27 +312,30 @@ namespace GriefClientPro
                             // Add player name
                             AddLabel(player.Name);
 
-                            // Add kill checkbox
-                            if (GUI.Toggle(new Rect(MenuRect.xMin + Padding + 160, Y, 20, 20), GriefClientPro.KillAllPlayers.PermaKillPlayers.Contains(player.SteamId), ""))
+                            if (player.SteamId > 0)
                             {
-                                GriefClientPro.KillAllPlayers.AddPlayerToPermaKill(player);
-                            }
-                            else
-                            {
-                                GriefClientPro.KillAllPlayers.RemovePlayerToPermaKill(player);
-                            }
-
-                            // Add fire trail checkbox
-                            if (GUI.Toggle(new Rect(MenuRect.xMin + Padding + 220, Y, 20, 20), LastFirePositions.ContainsKey(player.SteamId), ""))
-                            {
-                                if (!LastFirePositions.ContainsKey(player.SteamId))
+                                // Add kill checkbox
+                                if (GUI.Toggle(new Rect(MenuRect.xMin + Padding + 160, Y, 20, 20), GriefClientPro.KillAllPlayers.PermaKillPlayers.Contains(player.SteamId), ""))
                                 {
-                                    LastFirePositions.Add(player.SteamId, Vector3.zero);
+                                    GriefClientPro.KillAllPlayers.AddPlayerToPermaKill(player);
                                 }
-                            }
-                            else
-                            {
-                                LastFirePositions.Remove(player.SteamId);
+                                else
+                                {
+                                    GriefClientPro.KillAllPlayers.RemovePlayerToPermaKill(player);
+                                }
+
+                                // Add fire trail checkbox
+                                if (GUI.Toggle(new Rect(MenuRect.xMin + Padding + 220, Y, 20, 20), LastFirePositions.ContainsKey(player.SteamId), ""))
+                                {
+                                    if (!LastFirePositions.ContainsKey(player.SteamId))
+                                    {
+                                        LastFirePositions.Add(player.SteamId, Vector3.zero);
+                                    }
+                                }
+                                else
+                                {
+                                    LastFirePositions.Remove(player.SteamId);
+                                }
                             }
 
                             // Add teleport button
@@ -297,27 +347,39 @@ namespace GriefClientPro
                             // Add trap extreme button
                             if (AddButton("Trap", 385, 60))
                             {
-                                const int size = 5;
-                                for (var x = -size; x < size; x++)
+                                if (SpawnOffsets == null)
                                 {
-                                    for (var y = -1; y < size / 2; y++)
-                                    {
-                                        for (var z = -size; z < size; z++)
-                                        {
-                                            var offset = new Vector3(x * 8, y * 8, z * 8);
-                                            var position = player.Position + offset;
-                                            var rotation = Quaternion.LookRotation(new Vector3(z * 8, y * 8, -(x * 8)) - Vector3.zero);
+                                    SpawnOffsets = new List<Vector3>();
 
-                                            // Spawn the traps
-                                            //BoltPrefabsHelper.Spawn(BoltPrefabs.Trap_TripWireExplosiveBuilt, position, rotation);
-                                            BoltPrefabsHelper.Spawn(BoltPrefabs.instantDynamite, position, rotation);
+                                    const int size = 5;
+                                    for (var x = -size; x < size; x++)
+                                    {
+                                        for (var y = -1; y < size / 2; y++)
+                                        {
+                                            for (var z = -size; z < size; z++)
+                                            {
+                                                SpawnOffsets.Add(new Vector3(x * 8, y * 8, z * 8));
+                                            }
                                         }
                                     }
+
+                                    // Order offsets closest first
+                                    SpawnOffsets = SpawnOffsets.OrderBy(o => Vector3.Distance(Vector3.zero, o)).ThenBy(o => Vector3.Angle(Vector3.zero, o)).ToList();
+                                }
+
+                                foreach (var offset in SpawnOffsets)
+                                {
+                                    // Set the rotation of spawned objects facing the target player
+                                    var rotation = Quaternion.LookRotation(new Vector3(offset.z, offset.y, -offset.x) - Vector3.zero);
+
+                                    // Spawn the traps
+                                    //BoltPrefabsHelper.Spawn(BoltPrefabs.Trap_TripWireExplosiveBuilt, position, rotation);
+                                    BoltPrefabsHelper.Spawn(BoltPrefabs.Bomb_Timed_Placed, player.Position + offset, rotation);
                                 }
                             }
 
                             // Add steam profile button
-                            if (AddButton("Steam", 455, 75))
+                            if (player.SteamId > 0 && AddButton("Steam", 455, 75))
                             {
                                 SteamFriends.ActivateGameOverlayToUser("steamid", new CSteamID(player.SteamId));
                             }
@@ -329,11 +391,11 @@ namespace GriefClientPro
                     break;
                 }
 
-                    #endregion
+                #endregion
 
-                    #region Other
+                #region Other
 
-                case 3:
+                case 4:
                 {
                     AddLabel("Free cam:");
                     AddCheckBox(ref Values.Other.FreeCam, increaseY: true);
@@ -344,11 +406,11 @@ namespace GriefClientPro
                     break;
                 }
 
-                    #endregion
+                #endregion
 
-                    #region Sphere
+                #region Sphere
 
-                case 4:
+                case 5:
                 {
                     AddLabel("Enabled actions", Padding * 2, increaseY: true);
                     Y += Padding;
@@ -373,18 +435,9 @@ namespace GriefClientPro
                     break;
                 }
 
-                    #endregion
+                #endregion
 
-                    #region PermaKill
-
-                case 5:
-                {
-                    break;
-                }
-
-                    #endregion
-
-                    #region Aura
+                #region Aura
 
                 case 6:
                 {
@@ -406,9 +459,11 @@ namespace GriefClientPro
                     break;
                 }
 
-                    #endregion
+                #endregion
             }
         }
+
+        private List<Vector3> SpawnOffsets { get; set; }
 
         // ReSharper disable once UnusedMember.Local
         private void Update()

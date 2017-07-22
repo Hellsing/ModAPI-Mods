@@ -37,6 +37,7 @@ namespace GriefClientPro
         public static DestroyTrees DestroyTrees { get; private set; }
         public static Aura Aura { get; private set; }
         public static ChatManager ChatManager { get; private set; }
+        public static VoiceManager VoiceManager { get; private set; }
 
         [ExecuteOnGameStart]
         // ReSharper disable once UnusedMember.Local
@@ -86,6 +87,8 @@ namespace GriefClientPro
                 Aura = new Aura(this);
                 Logger.Info($"Setting up {nameof(ChatManager)}");
                 ChatManager = new ChatManager(this);
+                Logger.Info($"Setting up {nameof(VoiceManager)}");
+                VoiceManager = new VoiceManager(this);
                 Logger.Info("Initialization completed!");
             }
             catch (Exception e)
@@ -195,10 +198,10 @@ namespace GriefClientPro
                 }
 
                 var vector3 = Camera.main.transform.rotation * (
-                    new Vector3(Input.GetAxis("Horizontal"),
-                        0f,
-                        Input.GetAxis("Vertical")
-                        ) * multiplier);
+                                  new Vector3(Input.GetAxis("Horizontal"),
+                                      0f,
+                                      Input.GetAxis("Vertical")
+                                  ) * multiplier);
                 if (button3)
                 {
                     vector3.y += multiplier;

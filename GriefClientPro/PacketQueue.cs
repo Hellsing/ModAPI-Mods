@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Timers;
-using Bolt;
 using GriefClientPro.Utils;
 
 namespace GriefClientPro
 {
     public static class PacketQueue
     {
-        private static readonly List<Event> CurrentQueue = new List<Event>();
+        private static readonly List<Bolt.Event> CurrentQueue = new List<Bolt.Event>();
 
         static PacketQueue()
         {
@@ -43,7 +42,7 @@ namespace GriefClientPro
             }
         }
 
-        public static void Add(Event packet)
+        public static void Add(Bolt.Event packet)
         {
             lock (CurrentQueue)
             {

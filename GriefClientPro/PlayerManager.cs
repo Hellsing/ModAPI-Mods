@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Bolt;
+using GriefClientPro.Utils;
 using Steamworks;
 using TheForest.Networking;
 using TheForest.Utils;
@@ -26,14 +27,14 @@ namespace GriefClientPro
         private void OnTick(object sender, EventArgs args)
         {
             // Only in Multiplayer
-            if (!BoltNetwork.isRunning || Scene.SceneTracker == null || Scene.SceneTracker.allPlayerEntities == null)
+            if (!BoltNetwork.isRunning || TheForest.Utils.Scene.SceneTracker == null || TheForest.Utils.Scene.SceneTracker.allPlayerEntities == null)
             {
                 return;
             }
 
             // Refresh players
             Players.Clear();
-            Players.AddRange(Scene.SceneTracker.allPlayerEntities
+            Players.AddRange(TheForest.Utils.Scene.SceneTracker.allPlayerEntities
                 .Where(o => o.isAttached &&
                             o.StateIs<IPlayerState>() &&
                             LocalPlayer.Entity != o &&
@@ -56,10 +57,24 @@ namespace GriefClientPro
         private static readonly Dictionary<string, ulong> CachedIds = new Dictionary<string, ulong>();
 
         public BoltEntity Entity { get; }
-        public ulong SteamId =>
-            CachedIds.ContainsKey(Name)
-                ? CachedIds[Name]
-                : (CachedIds[Name] = CoopLobby.Instance.AllMembers.FirstOrDefault(o => SteamFriends.GetFriendPersonaName(o) == Name).m_SteamID);
+        public ulong SteamId
+        {
+            get
+            {
+                try
+                {
+                    return CachedIds.ContainsKey(Name)
+                        ? CachedIds[Name]
+                        : (CachedIds[Name] = (CoopLobby.Instance?.AllMembers.FirstOrDefault(o => SteamFriends.GetFriendPersonaName(o) == Name).m_SteamID) ?? 0);
+                }
+                catch (Exception e)
+                {
+                    Logger.Exception("Error while trying to get SteamId from player!", e);
+                }
+
+                return 0;
+            }
+        }
 
         public string Name => Entity.GetState<IPlayerState>().name;
         public BoltPlayerSetup PlayerSetup => Entity.GetComponent<BoltPlayerSetup>();
@@ -71,7 +86,7 @@ namespace GriefClientPro
                 var playerSetup = PlayerSetup;
                 if (playerSetup != null)
                 {
-                    var fieldInfo = typeof (BoltPlayerSetup).GetField("RespawnDeadTrigger", BindingFlags.NonPublic | BindingFlags.Instance);
+                    var fieldInfo = typeof(BoltPlayerSetup).GetField("RespawnDeadTrigger", BindingFlags.NonPublic | BindingFlags.Instance);
                     var gameObject = fieldInfo?.GetValue(playerSetup) as GameObject;
                     if (gameObject != null)
                     {

@@ -45,6 +45,14 @@
       <HintPath>../../../modlib/TheForest/TheForest_data/Managed/Assembly-UnityScript.dll</HintPath>
       <Private>False</Private>
     </Reference>
+<Reference Include="bolt">
+      <HintPath>../../../modlib/TheForest/TheForest_data/Managed/bolt.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+<Reference Include="bolt.user">
+      <HintPath>../../../modlib/TheForest/TheForest_data/Managed/bolt.user.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
 <Reference Include="SteamworksManaged">
       <HintPath>../../../modlib/TheForest/TheForest_data/Managed/SteamworksManaged.dll</HintPath>
       <Private>False</Private>
@@ -61,16 +69,12 @@
       <HintPath>../../../modlib/TheForest/TheForest_data/Managed/UnityScript.Lang.dll</HintPath>
       <Private>False</Private>
     </Reference>
+<Reference Include="AmplifyColor">
+      <HintPath>../../../modlib/TheForest/TheForest_data/Managed/AmplifyColor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
 <Reference Include="AmplifyMotion">
       <HintPath>../../../modlib/TheForest/TheForest_data/Managed/AmplifyMotion.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-<Reference Include="bolt">
-      <HintPath>../../../modlib/TheForest/TheForest_data/Managed/bolt.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-<Reference Include="bolt.user">
-      <HintPath>../../../modlib/TheForest/TheForest_data/Managed/bolt.user.dll</HintPath>
       <Private>False</Private>
     </Reference>
 <Reference Include="Boo.Lang">
@@ -113,14 +117,6 @@
       <HintPath>../../../modlib/TheForest/TheForest_data/Managed/Rewired_Core.dll</HintPath>
       <Private>False</Private>
     </Reference>
-<Reference Include="Rewired_Windows_Lib">
-      <HintPath>../../../modlib/TheForest/TheForest_data/Managed/Rewired_Windows_Lib.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-<Reference Include="SteamworksManaged">
-      <HintPath>../../../modlib/TheForest/TheForest_data/Managed/SteamworksManaged.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
 <Reference Include="System.Configuration">
       <HintPath>../../../modlib/TheForest/TheForest_data/Managed/System.Configuration.dll</HintPath>
       <Private>False</Private>
@@ -139,14 +135,6 @@
     </Reference>
 <Reference Include="System.Xml">
       <HintPath>../../../modlib/TheForest/TheForest_data/Managed/System.Xml.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-<Reference Include="TheForest.Commons">
-      <HintPath>../../../modlib/TheForest/TheForest_data/Managed/TheForest.Commons.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-<Reference Include="TheForest.Modding">
-      <HintPath>../../../modlib/TheForest/TheForest_data/Managed/TheForest.Modding.dll</HintPath>
       <Private>False</Private>
     </Reference>
 <Reference Include="UnityEngine">
@@ -180,7 +168,8 @@
 
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ChatManager.cs"  />
+    <Compile Include="VoiceManager.cs"  />
+<Compile Include="ChatManager.cs"  />
 <Compile Include="KeyActions\Aura.cs"  />
 <Compile Include="KeyActions\DestroyTrees.cs"  />
 <Compile Include="KeyActions\DestroyBuildings.cs"  />
@@ -189,10 +178,10 @@
 <Compile Include="KeyManager.cs"  />
 <Compile Include="KillAllPlayers.cs"  />
 <Compile Include="Menu.cs"  />
-<Compile Include="Overwrites\CoopVoiceEx.cs"  />
 <Compile Include="Overwrites\KeepAboveTerrainEx.cs"  />
 <Compile Include="Overwrites\PlayerHitReactionsEx.cs"  />
 <Compile Include="Overwrites\PlayerInventoryEx.cs"  />
+<Compile Include="Overwrites\UIGridEx.cs"  />
 <Compile Include="PacketQueue.cs"  />
 <Compile Include="PlayerManager.cs"  />
 <Compile Include="Overwrites\CoopClientCallbacksEx.cs"  />

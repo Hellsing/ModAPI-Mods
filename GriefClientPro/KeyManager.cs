@@ -50,7 +50,7 @@ namespace GriefClientPro
         private void OnTick(object sender, EventArgs args)
         {
             // Check keys
-            foreach (var key in Enum.GetValues(typeof (Keys)).Cast<Keys>())
+            foreach (var key in Enum.GetValues(typeof(Keys)).Cast<Keys>())
             {
                 var keyDown = ModAPI.Input.GetButton(key.ToString());
                 if (keyDown && !KeysDown.Contains(key))
