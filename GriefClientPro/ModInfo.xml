@@ -1,5 +1,5 @@
 <Mod ID="GriefClientPro">
-  <Compatible>Manual</Compatible>
+  <Compatible>0.65b</Compatible>
   <Button Standard="X" ID="SphereAction">
     <Name>
       <EN>Sphere Action</EN>
@@ -70,5 +70,5 @@
   <Description>
     <EN>Grief Client</EN>
   </Description>
-  <Version>0.64.1</Version>
+  <Version>0.65.1</Version>
 </Mod>

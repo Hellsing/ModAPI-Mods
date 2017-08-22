@@ -24,6 +24,8 @@ namespace GriefClientPro
 
         public event TickHandler OnTick;
 
+        public static GriefClientPro Instance { get; set; }
+
         private static GameObject DummyObject { get; set; }
         private static Vector3 LastFirePos { get; set; }
         private static int LastFireTime { get; set; }
@@ -68,6 +70,8 @@ namespace GriefClientPro
         {
             try
             {
+                Instance = this;
+
                 // Initialize properties
                 Logger.Info($"Setting up {nameof(KeyManager)}");
                 KeyManager = new KeyManager(this);
@@ -97,9 +101,9 @@ namespace GriefClientPro
             }
         }
 
-        protected bool LastFreezeTime;
-        protected bool LastFreeCam;
-        protected float RotationY;
+        public bool FreeCam;
+        private bool _lastFreeCam;
+        private float _rotationY;
 
         // ReSharper disable once UnusedMember.Local
         private void Update()
@@ -169,24 +173,24 @@ namespace GriefClientPro
                 }
             }
 
-            if (Menu.Values.Other.FreeCam && !LastFreeCam)
+            if (FreeCam && !_lastFreeCam)
             {
                 LocalPlayer.CamFollowHead.enabled = false;
                 LocalPlayer.CamRotator.enabled = false;
                 LocalPlayer.MainRotator.enabled = false;
                 LocalPlayer.FpCharacter.enabled = false;
-                LastFreeCam = true;
+                _lastFreeCam = true;
             }
-            if (!Menu.Values.Other.FreeCam && LastFreeCam)
+            if (!FreeCam && _lastFreeCam)
             {
                 LocalPlayer.CamFollowHead.enabled = true;
                 LocalPlayer.CamRotator.enabled = true;
                 LocalPlayer.MainRotator.enabled = true;
                 LocalPlayer.FpCharacter.enabled = true;
-                LastFreeCam = false;
+                _lastFreeCam = false;
             }
 
-            if (Menu.Values.Other.FreeCam && !Menu.IsOpen && !LocalPlayer.FpCharacter.Locked)
+            if (FreeCam && !Menu.IsOpen && !LocalPlayer.FpCharacter.Locked)
             {
                 var button1 = Input.GetButton("Crouch");
                 var button2 = Input.GetButton("Run");
@@ -213,14 +217,14 @@ namespace GriefClientPro
                 Camera.main.transform.position += vector3;
 
                 var rotationX = Camera.main.transform.localEulerAngles.y + Input.GetAxis("Mouse X") * 15f;
-                RotationY += Input.GetAxis("Mouse Y") * 15f;
-                RotationY = Mathf.Clamp(RotationY, -80f, 80f);
-                Camera.main.transform.localEulerAngles = new Vector3(-RotationY, rotationX, 0);
+                _rotationY += Input.GetAxis("Mouse Y") * 15f;
+                _rotationY = Mathf.Clamp(_rotationY, -80f, 80f);
+                Camera.main.transform.localEulerAngles = new Vector3(-_rotationY, rotationX, 0);
             }
 
             if (ModAPI.Input.GetButtonDown("FreeCam"))
             {
-                Menu.Values.Other.FreeCam = !Menu.Values.Other.FreeCam;
+                FreeCam = !FreeCam;
             }
 
             if (ModAPI.Input.GetButton("SphereAction"))
@@ -268,7 +272,7 @@ namespace GriefClientPro
                 }
             }
 
-            if (BoltNetwork.isRunning && Menu.Values.Other.InstaRevive)
+            if (BoltNetwork.isRunning && Menu.Values.Self.InstaRevive)
             {
                 foreach (var player in PlayerManager.Players)
                 {

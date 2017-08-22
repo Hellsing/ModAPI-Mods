@@ -58,7 +58,7 @@ namespace GriefClientPro.Overwrites
             swimmingSpeed = BaseSwimmingSpeed * Menu.Values.Self.SpeedMultiplier;
             maxSwimVelocity = BaseMaxSwimVelocity * Menu.Values.Self.SpeedMultiplier;
 
-            if (!Menu.Values.Other.FreeCam)
+            if (!GriefClientPro.Instance.FreeCam)
             {
                 if (Menu.Values.Self.FlyMode && !PushingSled)
                 {

@@ -28,6 +28,7 @@ namespace GriefClientPro
             {
                 public static Vector2 ScrollPosition = Vector2.zero;
 
+                public static bool InstaRevive;
                 public static bool Visible;
                 public static bool GodMode = true;
                 public static bool FireTrail;
@@ -37,10 +38,6 @@ namespace GriefClientPro
                 public static bool InstaDestroy;
                 public static float SpeedMultiplier = 1;
                 public static float JumpMultiplier = 1;
-            }
-
-            public static class Chat
-            {
             }
 
             public static class Stats
@@ -61,12 +58,6 @@ namespace GriefClientPro
                 public static float FixedStarvation = -1;
                 public static bool FixBodyTemp;
                 public static float FixedBodyTemp = -1;
-            }
-
-            public static class Other
-            {
-                public static bool FreeCam;
-                public static bool InstaRevive;
             }
         }
 
@@ -102,7 +93,7 @@ namespace GriefClientPro
             LocalPlayer.FpCharacter.LockView();
 
             // Apply the skin
-            GUI.skin = ModAPI.GUI.Skin;
+            GUI.skin = ModAPI.Gui.Skin;
 
             // Create the menu
             MenuRect = new Rect((Camera.main.pixelWidth - Width) / 2, 10, Width, Height);
@@ -114,7 +105,7 @@ namespace GriefClientPro
                     "Chat",
                     "Voice",
                     "Players",
-                    nameof(Values.Other),
+                    "Spawn",
                     "Sphere",
                     "Aura"
                 },
@@ -136,6 +127,9 @@ namespace GriefClientPro
                     Y = Padding;
 
                     AddLabel("OPTIONS", increaseY: true, autoAlign: false);
+
+                    AddLabel("InstantRevive:", autoAlign: false);
+                    AddCheckBox(ref Values.Self.InstaRevive, increaseY: true, autoAlign: false);
 
                     AddLabel("Visible:", autoAlign: false);
                     AddCheckBox(ref Values.Self.Visible, increaseY: true, autoAlign: false);
@@ -235,7 +229,7 @@ namespace GriefClientPro
                                 }
 
                                 // Add player name
-                                AddLabel(player.Name, 40, increaseY: true);
+                                AddLabel(player.FriendlyName, 40, increaseY: true);
                             }
                         }
                     }
@@ -282,7 +276,7 @@ namespace GriefClientPro
                                 }
 
                                 // Add player name
-                                AddLabel(player.Name, 40, increaseY: true);
+                                AddLabel(player.FriendlyName, 40, increaseY: true);
                             }
                         }
                     }
@@ -310,7 +304,7 @@ namespace GriefClientPro
                         foreach (var player in GriefClientPro.PlayerManager.Players)
                         {
                             // Add player name
-                            AddLabel(player.Name);
+                            AddLabel(player.FriendlyName);
 
                             if (player.SteamId > 0)
                             {
@@ -393,15 +387,10 @@ namespace GriefClientPro
 
                 #endregion
 
-                #region Other
+                #region Spawn
 
                 case 4:
                 {
-                    AddLabel("Free cam:");
-                    AddCheckBox(ref Values.Other.FreeCam, increaseY: true);
-
-                    AddLabel("InstantRevive:");
-                    AddCheckBox(ref Values.Other.InstaRevive, increaseY: true);
 
                     break;
                 }

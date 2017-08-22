@@ -75,8 +75,10 @@ namespace GriefClientPro
                 return 0;
             }
         }
+        public bool IsHost => SteamId == CoopLobby.Instance?.Info.OwnerSteamId.m_SteamID;
 
         public string Name => Entity.GetState<IPlayerState>().name;
+        public string FriendlyName => IsHost ? Name + " (Host)" : Name;
         public BoltPlayerSetup PlayerSetup => Entity.GetComponent<BoltPlayerSetup>();
         public CoopPlayerRemoteSetup CoopPlayer => Entity.GetComponent<CoopPlayerRemoteSetup>();
         public GameObject DeadTriggerObject

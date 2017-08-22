@@ -5,7 +5,7 @@
         public override void Disconnected(BoltConnection connection)
         {
             // Reset values
-            Menu.Values.Other.FreeCam = false;
+            GriefClientPro.Instance.FreeCam = false;
             Menu.Values.Self.Visible = false;
             Menu.Values.Self.NoClip = false;
             Menu.Values.Self.FlyMode = false;
