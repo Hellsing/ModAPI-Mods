@@ -48,7 +48,7 @@ namespace GriefClientPro
                 {
                     try
                     {
-                        var player = GriefClientPro.PlayerManager.GetPlayerBySteamId(steamId);
+                        Player player = GriefClientPro.PlayerManager.GetPlayerBySteamId(steamId);
                         if (player != null)
                         {
                             // Kill the player
@@ -61,11 +61,4 @@ namespace GriefClientPro
                     }
                 }
             }
-        }
-
-        public static void KillSinglePlayer(CoopPlayerRemoteSetup player)
-        {
-            player.hitFromEnemy(1000000);
-        }
-    }
-}
+        }}
