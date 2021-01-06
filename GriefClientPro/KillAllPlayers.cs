@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -7,6 +7,7 @@ namespace GriefClientPro
     public class KillAllPlayers
     {
         public HashSet<ulong> PermaKillPlayers { get; } = new HashSet<ulong>();
+        public object BoltNetwork { get; private set; }
 
         public KillAllPlayers(GriefClientPro instance)
         {
@@ -36,7 +37,7 @@ namespace GriefClientPro
             }
 
             // Remove missing players to kill
-            foreach (var steamId in PermaKillPlayers.ToArray().Where(steamId => GriefClientPro.PlayerManager.GetPlayerBySteamId(steamId) == null))
+            foreach (ulong steamId in PermaKillPlayers.ToArray().Where(steamId => GriefClientPro.PlayerManager.GetPlayerBySteamId(steamId) == null))
             {
                 PermaKillPlayers.Remove(steamId);
             }
@@ -44,11 +45,11 @@ namespace GriefClientPro
             // Execute PermaKill
             if (PermaKillPlayers.Count > 0)
             {
-                foreach (var steamId in PermaKillPlayers)
+                foreach (ulong steamId in PermaKillPlayers)
                 {
                     try
                     {
-                        var player = GriefClientPro.PlayerManager.GetPlayerBySteamId(steamId);
+                        Player player = GriefClientPro.PlayerManager.GetPlayerBySteamId(steamId);
                         if (player != null)
                         {
                             // Kill the player
